@@ -1,8 +1,16 @@
-const META_PIXEL_ID = import.meta.env.VITE_META_PIXEL_ID;
+let activeMetaPixelId = "";
 
-export const initMetaPixel = () => {
-  if (!META_PIXEL_ID) return;
-  if (window.fbq) return;
+export const initMetaPixel = (pixelId = "") => {
+  const finalPixelId = pixelId || import.meta.env.VITE_META_PIXEL_ID || "";
+
+  if (!finalPixelId) return;
+
+  activeMetaPixelId = finalPixelId;
+
+  if (window.fbq) {
+    window.fbq("init", finalPixelId);
+    return;
+  }
 
   /* eslint-disable */
   !(function (f, b, e, v, n, t, s) {
@@ -28,17 +36,17 @@ export const initMetaPixel = () => {
   );
   /* eslint-enable */
 
-  window.fbq("init", META_PIXEL_ID);
+  window.fbq("init", finalPixelId);
 };
 
 export const trackMetaPageView = () => {
-  if (!window.fbq) return;
+  if (!window.fbq || !activeMetaPixelId) return;
 
   window.fbq("track", "PageView");
 };
 
 export const trackMetaEvent = (eventName, params = {}, eventId = "") => {
-  if (!window.fbq) return;
+  if (!window.fbq || !activeMetaPixelId) return;
 
   if (eventId) {
     window.fbq("track", eventName, params, {

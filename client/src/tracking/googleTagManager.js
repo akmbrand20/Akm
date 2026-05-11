@@ -1,7 +1,11 @@
-const GTM_ID = import.meta.env.VITE_GTM_ID;
+let activeGTMId = "";
 
-export const initGTM = () => {
-  if (!GTM_ID) return;
+export const initGTM = (gtmId = "") => {
+  const finalGTMId = gtmId || import.meta.env.VITE_GTM_ID || "";
+
+  if (!finalGTMId) return;
+
+  activeGTMId = finalGTMId;
 
   window.dataLayer = window.dataLayer || [];
 
@@ -10,7 +14,7 @@ export const initGTM = () => {
   const script = document.createElement("script");
   script.id = "gtm-script";
   script.async = true;
-  script.src = `https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`;
+  script.src = `https://www.googletagmanager.com/gtm.js?id=${finalGTMId}`;
   document.head.appendChild(script);
 
   window.dataLayer.push({
