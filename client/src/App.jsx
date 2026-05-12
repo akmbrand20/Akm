@@ -1,4 +1,7 @@
 import { useLocation } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
+
 import PageLayout from "./components/layout/PageLayout";
 import TrackingProvider from "./components/tracking/TrackingProvider";
 import AppRoutes from "./routes/AppRoutes";
@@ -9,21 +12,25 @@ export default function App() {
   const isAdminRoute = location.pathname.startsWith("/admin");
 
   if (isAdminRoute) {
-  return (
-    <>
-      <ScrollToTop />
-      <AppRoutes />
-    </>
-  );
-}
+    return (
+      <>
+        <ScrollToTop />
+        <AppRoutes />
+        <Analytics />
+        <SpeedInsights />
+      </>
+    );
+  }
 
   return (
     <>
-    <ScrollToTop />
+      <ScrollToTop />
       <TrackingProvider />
       <PageLayout>
         <AppRoutes />
       </PageLayout>
+      <Analytics />
+      <SpeedInsights />
     </>
   );
 }
