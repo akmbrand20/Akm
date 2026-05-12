@@ -216,7 +216,7 @@ const sendCustomerOrderConfirmationEmail = async (order) => {
   }
 
   const whatsappNumber =
-    process.env.BRAND_WHATSAPP_NUMBER || "+201016028980";
+    process.env.BRAND_WHATSAPP_NUMBER || "+201014318607";
 
   const cleanWhatsappNumber = String(whatsappNumber).replace(/\D/g, "");
 

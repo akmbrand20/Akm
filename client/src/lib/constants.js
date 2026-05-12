@@ -1,8 +1,8 @@
 export const BRAND = {
   name: "AKM",
   tagline: "Comfort you can feel",
-  phone: "+20 10 16028980",
-  whatsappNumber: "201016028980",
+  phone: "+201014318607",
+  whatsappNumber: "+201014318607",
   instagram: "https://www.instagram.com/akmbrand74",
   tiktok: "https://www.tiktok.com/@akmbrand74",
   facebook: "",

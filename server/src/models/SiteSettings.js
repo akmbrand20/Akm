@@ -37,12 +37,12 @@ const siteSettingsSchema = new mongoose.Schema(
 
     whatsappNumber: {
       type: String,
-      default: "+201016028980",
+      default: "+201014318607",
     },
 
     phone: {
       type: String,
-      default: "+20 10 16028980",
+      default: "+201014318607",
     },
 
     instapayNumber: {

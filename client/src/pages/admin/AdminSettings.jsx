@@ -37,8 +37,8 @@ export default function AdminSettings() {
         },
         deliveryFee: settings.deliveryFee ?? 80,
         freeShippingThreshold: settings.freeShippingThreshold ?? "",
-        whatsappNumber: settings.whatsappNumber || "+201016028980",
-        phone: settings.phone || "+20 10 16028980",
+        whatsappNumber: settings.whatsappNumber || "+201014318607",
+        phone: settings.phone || "+201014318607",
         instapayNumber: settings.instapayNumber || "01014318607",
         instagramUrl: settings.instagramUrl || "",
         tiktokUrl: settings.tiktokUrl || "",
@@ -249,7 +249,7 @@ export default function AdminSettings() {
                   name="whatsappNumber"
                   value={form.whatsappNumber}
                   onChange={handleChange}
-                  placeholder="+201016028980"
+                  placeholder="+201014318607"
                   className="mt-2 w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-[#c8b89d]/60"
                 />
               </div>
