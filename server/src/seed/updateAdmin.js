@@ -9,7 +9,7 @@ const updateAdmin = async () => {
 
     const fullName = process.env.ADMIN_FULL_NAME || "AKM Admin";
     const email = process.env.ADMIN_EMAIL;
-    const phone = process.env.ADMIN_PHONE || "+20 10 16028980";
+    const phone = process.env.ADMIN_PHONE || "+201014318607";
     const password = process.env.ADMIN_PASSWORD;
 
     if (!email || !password) {

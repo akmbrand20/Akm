@@ -277,7 +277,7 @@ const settings = {
 const admin = {
   fullName: "AKM Admin",
   email: "admin@akm.com",
-  phone: "+20 10 16028980",
+  phone: "+201014318607",
   password: "123456",
 };
 
