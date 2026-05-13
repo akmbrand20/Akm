@@ -8,6 +8,7 @@ import {
   getProductReviews,
   submitCustomerReview,
 } from "../../services/reviewService";
+import { useLanguage } from "../../hooks/useLanguage";
 
 function Stars({ rating = 0 }) {
   return (
@@ -26,6 +27,7 @@ function Stars({ rating = 0 }) {
 export default function ProductReviews({ product }) {
   const queryClient = useQueryClient();
   const { isCustomerLoggedIn } = useCustomerAuth();
+  const { t } = useLanguage();
 
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
@@ -57,7 +59,7 @@ export default function ProductReviews({ product }) {
     onSuccess: (data) => {
       setComment("");
       setRating(5);
-      setSuccessMessage(data.message || "Review submitted for approval.");
+      setSuccessMessage(data.message || t("reviews.submitted"));
       queryClient.invalidateQueries({
         queryKey: ["customerReviewStatus", productId],
       });
@@ -101,19 +103,25 @@ export default function ProductReviews({ product }) {
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-sm uppercase tracking-[0.3em] text-[#c8b89d]">
-            Customer Reviews
+            {t("reviews.label")}
           </p>
 
           <h2 className="mt-3 text-3xl font-semibold">
-            What customers say
+            {t("reviews.title")}
           </h2>
 
           {approvedReviews.length > 0 && (
             <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-zinc-400">
               <Stars rating={Math.round(averageRating)} />
               <span>
-                {averageRating}/5 from {approvedReviews.length} review
-                {approvedReviews.length === 1 ? "" : "s"}
+                {t("reviews.average", {
+                  rating: averageRating,
+                  count: approvedReviews.length,
+                  reviewWord:
+                    approvedReviews.length === 1
+                      ? t("reviews.reviewSingular")
+                      : t("reviews.reviewPlural"),
+                })}
               </span>
             </div>
           )}
@@ -150,16 +158,18 @@ export default function ProductReviews({ product }) {
 
       {isCustomerLoggedIn && (
         <div className="mt-8 rounded-3xl border border-white/10 bg-black/25 p-5">
-          <h3 className="text-xl font-semibold">Write a review</h3>
+          <h3 className="text-xl font-semibold">{t("reviews.write")}</h3>
 
           {statusLoading ? (
             <p className="mt-3 text-sm text-zinc-400">
-              Checking review eligibility...
+              {t("reviews.checking")}
             </p>
           ) : canReview ? (
             <form onSubmit={handleSubmit} className="mt-5 grid gap-4">
               <div>
-                <label className="text-sm text-zinc-300">Rating</label>
+                <label className="text-sm text-zinc-300">
+                  {t("reviews.rating")}
+                </label>
 
                 <div className="mt-2 flex flex-wrap gap-2">
                   {[1, 2, 3, 4, 5].map((value) => (
@@ -180,12 +190,14 @@ export default function ProductReviews({ product }) {
               </div>
 
               <div>
-                <label className="text-sm text-zinc-300">Review</label>
+                <label className="text-sm text-zinc-300">
+                  {t("reviews.review")}
+                </label>
                 <textarea
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   rows="4"
-                  placeholder="Tell us what you think about this product..."
+                  placeholder={t("reviews.placeholder")}
                   className="mt-2 w-full resize-none rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-[#c8b89d]/60"
                 />
               </div>
@@ -193,7 +205,7 @@ export default function ProductReviews({ product }) {
               {submitMutation.isError && (
                 <div className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
                   {submitMutation.error?.response?.data?.message ||
-                    "Failed to submit review."}
+                    t("reviews.failed")}
                 </div>
               )}
 
@@ -209,15 +221,15 @@ export default function ProductReviews({ product }) {
                 className="rounded-full bg-[#f7f2ea] px-6 py-4 font-semibold text-black transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {submitMutation.isPending
-                  ? "Submitting..."
-                  : `Submit Review (${remainingReviews} left)`}
+                  ? t("reviews.submitting")
+                  : t("reviews.submit", { count: remainingReviews })}
               </button>
             </form>
           ) : (
             <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-6 text-zinc-400">
               {!hasPurchased
-                ? "You can review this product after ordering it from this account."
-                : "You already used your 3 reviews for this product."}
+                ? t("reviews.needPurchase")
+                : t("reviews.limitReached")}
             </div>
           )}
         </div>

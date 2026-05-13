@@ -5,10 +5,12 @@ import { useCustomerAuth } from "../../context/CustomerAuthContext";
 import { getMyOrderById } from "../../services/customerOrderService";
 import { formatCurrency } from "../../lib/formatCurrency";
 import SEO from "../../components/common/SEO";
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function MyOrderDetails() {
   const { id } = useParams();
   const { isCustomerLoggedIn, loading } = useCustomerAuth();
+  const { t } = useLanguage();
 
   const {
     data: order,
@@ -28,7 +30,7 @@ export default function MyOrderDetails() {
     return (
       <main className="min-h-screen bg-[#050505] px-6 py-20 text-[#f7f2ea]">
         <div className="mx-auto max-w-5xl text-zinc-400">
-          Loading order...
+          {t("orders.loading")}
         </div>
       </main>
     );
@@ -38,9 +40,9 @@ export default function MyOrderDetails() {
     return (
       <main className="min-h-screen bg-[#050505] px-6 py-20 text-[#f7f2ea]">
         <div className="mx-auto max-w-5xl">
-          <p className="text-red-300">Order not found.</p>
+          <p className="text-red-300">{t("orders.notFound")}</p>
           <Link to="/my-orders" className="mt-5 inline-block text-[#c8b89d]">
-            Back to my orders
+            {t("orders.backToMyOrders")}
           </Link>
         </div>
       </main>
@@ -51,7 +53,7 @@ export default function MyOrderDetails() {
     <main className="min-h-screen bg-[#050505] px-6 py-20 text-[#f7f2ea] md:px-12">
       <SEO
         title={`${order.orderNumber} | AKM`}
-        description="View your AKM order details."
+        description={t("orders.viewDetailsDescription")}
       />
 
       <div className="mx-auto max-w-5xl">
@@ -60,12 +62,12 @@ export default function MyOrderDetails() {
           className="inline-flex items-center gap-2 text-sm text-[#c8b89d] hover:text-white"
         >
           <ArrowLeft size={16} />
-          Back to my orders
+          {t("orders.backToMyOrders")}
         </Link>
 
         <div className="mt-8">
           <p className="text-sm uppercase tracking-[0.3em] text-[#c8b89d]">
-            Order Details
+            {t("orders.orderDetails")}
           </p>
 
           <h1 className="mt-3 text-4xl font-semibold">
@@ -73,13 +75,16 @@ export default function MyOrderDetails() {
           </h1>
 
           <p className="mt-3 text-zinc-400">
-            Status: {order.orderStatus} · Payment: {order.paymentMethod}
+            {t("orders.statusPayment", {
+              status: order.orderStatus,
+              payment: order.paymentMethod,
+            })}
           </p>
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
           <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
-            <h2 className="text-2xl font-semibold">Items</h2>
+            <h2 className="text-2xl font-semibold">{t("common.items")}</h2>
 
             <div className="mt-5 space-y-4">
               {order.items.map((item, index) => (
@@ -103,11 +108,11 @@ export default function MyOrderDetails() {
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 lg:self-start">
-            <h2 className="text-2xl font-semibold">Summary</h2>
+            <h2 className="text-2xl font-semibold">{t("common.summary")}</h2>
 
             <div className="mt-6 space-y-4 text-sm">
               <div className="flex justify-between text-zinc-300">
-                <span>Subtotal</span>
+                <span>{t("common.subtotal")}</span>
                 <span>{formatCurrency(order.subtotal)}</span>
               </div>
 
@@ -120,23 +125,23 @@ export default function MyOrderDetails() {
 
               {order.coupon?.discount > 0 && (
                 <div className="flex justify-between text-[#c8b89d]">
-                  <span>Coupon {order.coupon.code}</span>
+                  <span>{t("cart.couponLine", { code: order.coupon.code })}</span>
                   <span>-{formatCurrency(order.coupon.discount)}</span>
                 </div>
               )}
 
               <div className="flex justify-between text-zinc-300">
-                <span>Delivery</span>
+                <span>{t("common.delivery")}</span>
                 <span>
                   {order.shippingFee === 0
-                    ? "Free"
+                    ? t("common.free")
                     : formatCurrency(order.shippingFee)}
                 </span>
               </div>
 
               <div className="border-t border-white/10 pt-4">
                 <div className="flex justify-between text-lg font-semibold">
-                  <span>Total</span>
+                  <span>{t("common.total")}</span>
                   <span>{formatCurrency(order.total)}</span>
                 </div>
               </div>

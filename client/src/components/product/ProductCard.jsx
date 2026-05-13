@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { formatCurrency } from "../../lib/formatCurrency";
 import { formatProductLabel } from "../../lib/constants";
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function ProductCard({ product }) {
+  const { t, isArabic } = useLanguage();
   const blackColor = product.colors?.find(
     (color) => color.name?.toLowerCase() === "black"
   );
@@ -24,7 +26,7 @@ export default function ProductCard({ product }) {
       <div className="relative aspect-[4/5] overflow-hidden bg-white/[0.04]">
         {hasOffer && (
           <span className="absolute left-4 top-4 z-10 rounded-full bg-[#c8b89d] px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-black">
-            {product.activeOffer.badge || "Offer"}
+            {product.activeOffer.badge || t("common.offer")}
           </span>
         )}
 
@@ -40,7 +42,9 @@ export default function ProductCard({ product }) {
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="text-xs uppercase tracking-[0.25em] text-[#c8b89d]">
-              {formatProductLabel(product.category)}
+              {isArabic
+                ? t(`categories.${product.category}`)
+                : formatProductLabel(product.category)}
             </p>
 
             <h3 className="mt-2 break-words text-xl font-semibold text-[#f7f2ea]">
@@ -48,7 +52,7 @@ export default function ProductCard({ product }) {
             </h3>
           </div>
 
-          <div className="shrink-0 text-right">
+          <div className={`shrink-0 ${isArabic ? "text-left" : "text-right"}`}>
             {hasOffer ? (
               <>
                 <p className="text-xs text-zinc-500 line-through">

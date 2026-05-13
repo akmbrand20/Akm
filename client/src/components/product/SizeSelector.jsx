@@ -1,20 +1,24 @@
+import { useLanguage } from "../../hooks/useLanguage";
+
 export default function SizeSelector({
   sizes = [],
   selectedSize,
   onSelect,
   onOpenSizeGuide,
 }) {
+  const { t } = useLanguage();
+
   return (
     <div>
       <div className="flex items-center justify-between gap-4">
-        <p className="text-sm font-medium text-white">Size</p>
+        <p className="text-sm font-medium text-white">{t("common.size")}</p>
 
         <button
           type="button"
           onClick={onOpenSizeGuide}
           className="text-sm text-[#c8b89d] hover:text-white"
         >
-          Size Guide
+          {t("sizeGuide.label")}
         </button>
       </div>
 

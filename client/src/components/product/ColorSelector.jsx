@@ -1,8 +1,12 @@
+import { useLanguage } from "../../hooks/useLanguage";
+
 export default function ColorSelector({ colors = [], selectedColor, onSelect }) {
+  const { t } = useLanguage();
+
   return (
     <div>
       <div className="flex items-center justify-between gap-4">
-        <p className="text-sm font-medium text-white">Color</p>
+        <p className="text-sm font-medium text-white">{t("common.color")}</p>
         <p className="text-sm text-zinc-400">{selectedColor}</p>
       </div>
 

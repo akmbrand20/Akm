@@ -1,14 +1,17 @@
 import { Link } from "react-router-dom";
 import { formatCurrency } from "../../lib/formatCurrency";
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function CartSummary({ totals, checkoutButton = true }) {
+  const { t } = useLanguage();
+
   return (
     <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
-      <h2 className="text-2xl font-semibold">Order Summary</h2>
+      <h2 className="text-2xl font-semibold">{t("cart.orderSummary")}</h2>
 
       <div className="mt-6 space-y-4 text-sm">
         <div className="flex items-center justify-between text-zinc-300">
-          <span>Subtotal</span>
+          <span>{t("common.subtotal")}</span>
           <span>{formatCurrency(totals.subtotal)}</span>
         </div>
 
@@ -27,21 +30,23 @@ export default function CartSummary({ totals, checkoutButton = true }) {
 
         {totals.couponDiscount > 0 && (
           <div className="flex items-center justify-between text-[#c8b89d]">
-            <span>Coupon {totals.couponCode}</span>
+            <span>{t("cart.couponLine", { code: totals.couponCode })}</span>
             <span>-{formatCurrency(totals.couponDiscount)}</span>
           </div>
         )}
 
         <div className="flex items-center justify-between text-zinc-300">
-          <span>Delivery</span>
+          <span>{t("common.delivery")}</span>
           <span>
-            {totals.shippingFee === 0 ? "Free" : formatCurrency(totals.shippingFee)}
+            {totals.shippingFee === 0
+              ? t("common.free")
+              : formatCurrency(totals.shippingFee)}
           </span>
         </div>
 
         <div className="border-t border-white/10 pt-4">
           <div className="flex items-center justify-between text-lg font-semibold">
-            <span>Total</span>
+            <span>{t("common.total")}</span>
             <span>{formatCurrency(totals.total)}</span>
           </div>
         </div>
@@ -52,7 +57,7 @@ export default function CartSummary({ totals, checkoutButton = true }) {
           to="/checkout"
           className="mt-6 block rounded-full bg-[#f7f2ea] px-6 py-4 text-center font-semibold text-black hover:bg-white"
         >
-          Proceed to Checkout
+          {t("cart.proceed")}
         </Link>
       )}
     </div>

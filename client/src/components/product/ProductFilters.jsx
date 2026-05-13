@@ -1,4 +1,5 @@
 import { formatProductLabel } from "../../lib/constants";
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function ProductFilters({
   search,
@@ -13,6 +14,7 @@ export default function ProductFilters({
   colorOptions = [],
   sizeOptions = [],
 }) {
+  const { t } = useLanguage();
   const hasFilters = search || category || color || size;
 
   return (
@@ -21,7 +23,7 @@ export default function ProductFilters({
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search products..."
+          placeholder={t("filters.search")}
           className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-[#c8b89d]/60"
         />
 
@@ -30,10 +32,11 @@ export default function ProductFilters({
           onChange={(e) => setCategory(e.target.value)}
           className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none focus:border-[#c8b89d]/60"
         >
-          <option value="">All categories</option>
+          <option value="">{t("filters.allCategories")}</option>
           {categoryOptions.map((categoryOption) => (
             <option key={categoryOption} value={categoryOption}>
-              {formatProductLabel(categoryOption)}
+              {t(`categories.${categoryOption}`) ||
+                formatProductLabel(categoryOption)}
             </option>
           ))}
         </select>
@@ -43,7 +46,7 @@ export default function ProductFilters({
           onChange={(e) => setColor(e.target.value)}
           className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none focus:border-[#c8b89d]/60"
         >
-          <option value="">All colors</option>
+          <option value="">{t("filters.allColors")}</option>
           {colorOptions.map((colorOption) => (
             <option key={colorOption} value={colorOption}>
               {colorOption}
@@ -56,7 +59,7 @@ export default function ProductFilters({
           onChange={(e) => setSize(e.target.value)}
           className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none focus:border-[#c8b89d]/60"
         >
-          <option value="">All sizes</option>
+          <option value="">{t("filters.allSizes")}</option>
           {sizeOptions.map((sizeOption) => (
             <option key={sizeOption} value={sizeOption}>
               {sizeOption}
@@ -76,7 +79,7 @@ export default function ProductFilters({
           }}
           className="mt-4 rounded-full border border-white/10 px-4 py-2 text-sm text-zinc-300 hover:border-[#c8b89d]/60 hover:text-white"
         >
-          Clear filters
+          {t("filters.clear")}
         </button>
       )}
     </div>

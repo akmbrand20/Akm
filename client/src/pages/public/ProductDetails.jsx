@@ -23,6 +23,7 @@ import StockBadge from "../../components/product/StockBadge";
 import ProductCard from "../../components/product/ProductCard";
 import SEO from "../../components/common/SEO";
 import ProductReviews from "../../components/product/ProductReviews";
+import { useLanguage } from "../../hooks/useLanguage";
 
 const getFirstAvailableSize = (sizes = []) => {
   return sizes.find((item) => Number(item.stock || 0) > 0)?.size || sizes[0]?.size || "";
@@ -31,6 +32,7 @@ const getFirstAvailableSize = (sizes = []) => {
 export default function ProductDetails() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { t, isArabic } = useLanguage();
 
   const { addToCart, getCartItemQuantity } = useCart();
   const { whatsappNumber } = useSettings();
@@ -148,7 +150,7 @@ offerTitle: product.activeOffer?.title || "",
     if (!selectedColor || !selectedSize || selectedStock <= 0) return;
 
     if (remainingStock <= 0) {
-      showTemporaryMessage(`You already added all available stock for this selection.`);
+      showTemporaryMessage(t("product.allStockAdded"));
       return;
     }
 
@@ -157,9 +159,9 @@ offerTitle: product.activeOffer?.title || "",
 
     if (wasAdded) {
       trackAddToCart(cartItem);
-      showTemporaryMessage("Added to cart.");
+      showTemporaryMessage(t("product.added"));
     } else {
-      showTemporaryMessage(`You already added all available stock for this selection.`);
+      showTemporaryMessage(t("product.allStockAdded"));
     }
   };
 
@@ -187,16 +189,18 @@ offerTitle: product.activeOffer?.title || "",
   };
 
   const whatsappMessage = encodeURIComponent(
-    `Hello AKM, I want to ask about ${
-      product?.name || "this product"
-    } - ${selectedColor || "Color"} / ${selectedSize || "Size"}.`
+    t("product.whatsappMessage", {
+      product: product?.name || t("product.thisProduct"),
+      color: selectedColor || t("product.colorFallback"),
+      size: selectedSize || t("product.sizeFallback"),
+    })
   );
 
   if (isLoading) {
     return (
       <main className="min-h-screen bg-[#050505] px-5 py-20 text-[#f7f2ea] md:px-12">
         <div className="mx-auto max-w-6xl text-zinc-400">
-          Loading product...
+          {t("product.loading")}
         </div>
       </main>
     );
@@ -206,10 +210,10 @@ offerTitle: product.activeOffer?.title || "",
     return (
       <main className="min-h-screen bg-[#050505] px-5 py-20 text-[#f7f2ea] md:px-12">
         <div className="mx-auto max-w-6xl">
-          <p className="text-red-300">Product not found.</p>
+          <p className="text-red-300">{t("product.notFound")}</p>
 
           <Link to="/shop" className="mt-5 inline-block text-[#c8b89d]">
-            Back to shop
+            {t("common.backToShop")}
           </Link>
         </div>
       </main>
@@ -224,7 +228,7 @@ offerTitle: product.activeOffer?.title || "",
         title={`${product.name} | AKM`}
         description={
           product.description ||
-          `${product.name} by AKM. Available in Black, Brown, and Off White.`
+          t("product.defaultDescription", { name: product.name })
         }
         image={images?.[0]?.url || ""}
         type="product"
@@ -233,7 +237,7 @@ offerTitle: product.activeOffer?.title || "",
       <main className="min-h-screen bg-[#050505] px-5 py-20 pb-28 text-[#f7f2ea] md:px-12 md:pb-20">
         <div className="mx-auto max-w-6xl">
           <Link to="/shop" className="text-sm text-[#c8b89d] hover:text-white">
-            ← Back to shop
+            {t("product.back")}
           </Link>
 
           <section className="mt-8 grid min-w-0 gap-10 lg:grid-cols-[1.05fr_0.95fr]">
@@ -241,7 +245,9 @@ offerTitle: product.activeOffer?.title || "",
 
             <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
               <p className="text-xs uppercase tracking-[0.3em] text-[#c8b89d]">
-                {formatProductLabel(product.category)}
+                {isArabic
+                  ? t(`categories.${product.category}`)
+                  : formatProductLabel(product.category)}
               </p>
 
               <h1 className="mt-3 break-words text-4xl font-semibold md:text-5xl">
@@ -258,7 +264,7 @@ offerTitle: product.activeOffer?.title || "",
         {formatCurrency(product.price)}
       </p>
       <span className="rounded-full bg-[#c8b89d] px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-black">
-        {product.activeOffer.badge || "Offer"}
+        {product.activeOffer.badge || t("common.offer")}
       </span>
     </div>
 
@@ -299,8 +305,9 @@ offerTitle: product.activeOffer?.title || "",
 
                 {selectedStock > 0 && currentCartQuantity > 0 && (
                   <p className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-zinc-300">
-                    You already have {currentCartQuantity} in cart for this
-                    color and size.
+                    {t("product.alreadyInCart", {
+                      count: currentCartQuantity,
+                    })}
                   </p>
                 )}
 
@@ -319,8 +326,8 @@ offerTitle: product.activeOffer?.title || "",
                   >
                     <ShoppingBag size={18} />
                     {remainingStock <= 0 && selectedStock > 0
-                      ? "Max Added"
-                      : "Add to Cart"}
+                      ? t("product.maxAdded")
+                      : t("product.addToCart")}
                   </button>
 
                   <button
@@ -330,7 +337,7 @@ offerTitle: product.activeOffer?.title || "",
                     className="flex items-center justify-center gap-2 rounded-full bg-[#c8b89d] px-6 py-4 font-semibold text-black transition hover:bg-[#dfcfb3] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <Zap size={18} />
-                    Buy Now
+                    {t("product.buyNow")}
                   </button>
                 </div>
 
@@ -341,27 +348,30 @@ offerTitle: product.activeOffer?.title || "",
                   className="flex items-center justify-center gap-2 rounded-full border border-white/10 px-6 py-4 font-medium text-white transition hover:border-[#c8b89d]/60"
                 >
                   <MessageCircle size={18} />
-                  Ask on WhatsApp
+                  {t("product.askWhatsapp")}
                 </a>
               </div>
 
               <div className="mt-8 grid gap-3 text-sm text-zinc-300">
                 {product.fabric && (
                   <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                    <span className="text-[#c8b89d]">Fabric:</span>{" "}
+                    <span className="text-[#c8b89d]">
+                      {t("common.fabric")}
+                    </span>{" "}
                     {product.fabric}
                   </div>
                 )}
 
                 {product.fit && (
                   <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                    <span className="text-[#c8b89d]">Fit:</span> {product.fit}
+                    <span className="text-[#c8b89d]">{t("common.fit")}</span>{" "}
+                    {product.fit}
                   </div>
                 )}
 
                 {product.careInstructions && (
                   <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                    <span className="text-[#c8b89d]">Care:</span>{" "}
+                    <span className="text-[#c8b89d]">{t("common.care")}</span>{" "}
                     {product.careInstructions}
                   </div>
                 )}
@@ -375,11 +385,11 @@ offerTitle: product.activeOffer?.title || "",
             <section className="mt-24">
               <div className="mb-8">
                 <p className="text-sm uppercase tracking-[0.3em] text-[#c8b89d]">
-                  Complete The Look
+                  {t("product.completeLook")}
                 </p>
 
                 <h2 className="mt-3 text-3xl font-semibold">
-                  Pair it with the matching essential.
+                  {t("product.completeLookTitle")}
                 </h2>
               </div>
 
@@ -401,12 +411,15 @@ offerTitle: product.activeOffer?.title || "",
           className="w-full rounded-full bg-[#f7f2ea] px-6 py-4 font-semibold text-black disabled:cursor-not-allowed disabled:opacity-50"
         >
           {remainingStock <= 0 && selectedStock > 0
-            ? "Max Stock Added"
-            : `Add to Cart — ${formatCurrency(
-  product.activeOffer && Number(product.salePrice) < Number(product.price)
-    ? product.salePrice
-    : product.price
-)}`}
+            ? t("product.mobileMax")
+            : t("product.mobileAdd", {
+                price: formatCurrency(
+                  product.activeOffer &&
+                    Number(product.salePrice) < Number(product.price)
+                    ? product.salePrice
+                    : product.price
+                ),
+              })}
         </button>
       </div>
 

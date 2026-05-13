@@ -1,29 +1,29 @@
 import { BadgeCheck, RefreshCcw, Truck } from "lucide-react";
 import { useSettings } from "../../context/SettingsContext";
 import { formatCurrency } from "../../lib/formatCurrency";
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function TrustBadges() {
   const { deliveryFee, policies } = useSettings();
+  const { t } = useLanguage();
 
   const badges = [
     {
       icon: Truck,
-      title: "Delivery in Egypt",
-      text: `Delivery fee is ${formatCurrency(
-        deliveryFee
-      )}. Delivery details will be confirmed after placing your order.`,
+      title: t("trust.deliveryTitle"),
+      text: t("trust.deliveryText", { amount: formatCurrency(deliveryFee) }),
     },
     {
       icon: RefreshCcw,
-      title: "Exchange Support",
+      title: t("trust.exchangeTitle"),
       text:
         policies?.returnPolicy ||
-        "Exchange policy details will be confirmed by AKM.",
+        t("trust.exchangeFallback"),
     },
     {
       icon: BadgeCheck,
-      title: "Secure Checkout",
-      text: "Your order details are safely submitted to AKM.",
+      title: t("trust.secureTitle"),
+      text: t("trust.secureText"),
     },
   ];
 

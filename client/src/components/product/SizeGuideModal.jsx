@@ -1,7 +1,10 @@
 import { X } from "lucide-react";
 import { sizeGuideData } from "../../data/sizeGuideData";
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function SizeGuideModal({ isOpen, onClose }) {
+  const { t, isArabic } = useLanguage();
+
   if (!isOpen) return null;
 
   return (
@@ -10,10 +13,10 @@ export default function SizeGuideModal({ isOpen, onClose }) {
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-[#c8b89d]">
-              Size Guide
+              {t("sizeGuide.label")}
             </p>
             <h2 className="mt-2 text-2xl font-semibold">
-              Find your recommended size
+              {t("sizeGuide.title")}
             </h2>
           </div>
 
@@ -27,12 +30,12 @@ export default function SizeGuideModal({ isOpen, onClose }) {
         </div>
 
         <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
-          <table className="w-full text-left text-sm">
+          <table className={`w-full text-sm ${isArabic ? "text-right" : "text-left"}`}>
             <thead className="bg-white/[0.04] text-[#c8b89d]">
               <tr>
-                <th className="px-4 py-3 font-medium">Size</th>
-                <th className="px-4 py-3 font-medium">Weight</th>
-                <th className="px-4 py-3 font-medium">Height</th>
+                <th className="px-4 py-3 font-medium">{t("sizeGuide.size")}</th>
+                <th className="px-4 py-3 font-medium">{t("sizeGuide.weight")}</th>
+                <th className="px-4 py-3 font-medium">{t("sizeGuide.height")}</th>
               </tr>
             </thead>
 
@@ -49,8 +52,7 @@ export default function SizeGuideModal({ isOpen, onClose }) {
         </div>
 
         <p className="mt-5 text-sm leading-6 text-zinc-400">
-          This guide is based on recommended height and weight ranges. For a more
-          oversized or relaxed fit, consider sizing up.
+          {t("sizeGuide.note")}
         </p>
       </div>
     </div>

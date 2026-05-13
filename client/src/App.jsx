@@ -6,6 +6,7 @@ import PageLayout from "./components/layout/PageLayout";
 import TrackingProvider from "./components/tracking/TrackingProvider";
 import AppRoutes from "./routes/AppRoutes";
 import ScrollToTop from "./components/common/ScrollToTop";
+import { LanguageProvider } from "./context/LanguageContext";
 
 export default function App() {
   const location = useLocation();
@@ -25,10 +26,12 @@ export default function App() {
   return (
     <>
       <ScrollToTop />
-      <TrackingProvider />
-      <PageLayout>
-        <AppRoutes />
-      </PageLayout>
+      <LanguageProvider>
+        <TrackingProvider />
+        <PageLayout>
+          <AppRoutes />
+        </PageLayout>
+      </LanguageProvider>
       <Analytics />
       <SpeedInsights />
     </>

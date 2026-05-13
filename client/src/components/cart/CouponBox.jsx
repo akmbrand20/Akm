@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Tag, X } from "lucide-react";
 import { validateCouponCode } from "../../services/couponService";
 import { formatCurrency } from "../../lib/formatCurrency";
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function CouponBox({
   totals,
@@ -10,6 +11,7 @@ export default function CouponBox({
   applyCoupon,
   removeCoupon,
 }) {
+  const { t } = useLanguage();
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
 
@@ -27,7 +29,7 @@ export default function CouponBox({
       setError("");
     },
     onError: (err) => {
-      setError(err?.response?.data?.message || "Invalid coupon code.");
+      setError(err?.response?.data?.message || t("couponBox.invalid"));
     },
   });
 
@@ -37,7 +39,7 @@ export default function CouponBox({
     setError("");
 
     if (!code.trim()) {
-      setError("Enter a coupon code first.");
+      setError(t("couponBox.enterFirst"));
       return;
     }
 
@@ -53,13 +55,15 @@ export default function CouponBox({
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-sm uppercase tracking-[0.25em] text-[#c8b89d]">
-              Coupon Applied
+              {t("couponBox.applied")}
             </p>
 
             <h2 className="mt-2 text-xl font-semibold">{coupon.code}</h2>
 
             <p className="mt-2 text-sm text-zinc-300">
-              You saved {formatCurrency(coupon.discount)} with this coupon.
+              {t("couponBox.saved", {
+                amount: formatCurrency(coupon.discount),
+              })}
             </p>
           </div>
 
@@ -82,14 +86,14 @@ export default function CouponBox({
     >
       <div className="flex items-center gap-2">
         <Tag size={18} className="text-[#c8b89d]" />
-        <h2 className="text-xl font-semibold">Have a coupon?</h2>
+        <h2 className="text-xl font-semibold">{t("couponBox.title")}</h2>
       </div>
 
       <div className="mt-4 flex flex-col gap-3 sm:flex-row">
         <input
           value={code}
           onChange={(e) => setCode(e.target.value)}
-          placeholder="Enter coupon code"
+          placeholder={t("couponBox.placeholder")}
           className="flex-1 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm uppercase text-white outline-none placeholder:normal-case placeholder:text-zinc-500 focus:border-[#c8b89d]/60"
         />
 
@@ -98,7 +102,7 @@ export default function CouponBox({
           disabled={validateMutation.isPending}
           className="rounded-2xl bg-[#f7f2ea] px-5 py-3 text-sm font-semibold text-black disabled:opacity-60"
         >
-          {validateMutation.isPending ? "Checking..." : "Apply"}
+          {validateMutation.isPending ? t("common.checking") : t("common.apply")}
         </button>
       </div>
 

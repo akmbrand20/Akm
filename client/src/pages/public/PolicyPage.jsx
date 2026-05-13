@@ -1,21 +1,22 @@
 import { Link, useParams } from "react-router-dom";
 import { useSettings } from "../../context/SettingsContext";
+import { useLanguage } from "../../hooks/useLanguage";
 
 const policyConfig = {
   shipping: {
-    label: "Shipping Policy",
+    labelKey: "policy.shipping",
     key: "shippingPolicy",
   },
   returns: {
-    label: "Return & Exchange Policy",
+    labelKey: "policy.returns",
     key: "returnPolicy",
   },
   privacy: {
-    label: "Privacy Policy",
+    labelKey: "policy.privacy",
     key: "privacyPolicy",
   },
   terms: {
-    label: "Terms & Conditions",
+    labelKey: "policy.terms",
     key: "terms",
   },
 };
@@ -23,6 +24,7 @@ const policyConfig = {
 export default function PolicyPage() {
   const { type } = useParams();
   const { policies } = useSettings();
+  const { t } = useLanguage();
 
   const config = policyConfig[type];
 
@@ -30,9 +32,9 @@ export default function PolicyPage() {
     return (
       <main className="min-h-screen bg-[#050505] px-6 py-20 text-[#f7f2ea] md:px-12">
         <div className="mx-auto max-w-4xl">
-          <p className="text-red-300">Policy page not found.</p>
+          <p className="text-red-300">{t("policy.notFound")}</p>
           <Link to="/" className="mt-5 inline-block text-[#c8b89d]">
-            Back home
+            {t("common.backHome")}
           </Link>
         </div>
       </main>
@@ -41,7 +43,7 @@ export default function PolicyPage() {
 
   const content =
     policies?.[config.key] ||
-    "This policy will be updated soon. Please contact AKM for more details.";
+    t("policy.fallback");
 
   return (
     <main className="min-h-screen bg-[#050505] px-6 py-20 text-[#f7f2ea] md:px-12">
@@ -51,7 +53,7 @@ export default function PolicyPage() {
         </p>
 
         <h1 className="mt-3 text-4xl font-semibold md:text-6xl">
-          {config.label}
+          {t(config.labelKey)}
         </h1>
 
         <div className="mt-10 rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">

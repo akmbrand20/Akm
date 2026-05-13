@@ -13,10 +13,12 @@ import { useCart } from "../../context/CartContext";
 import { useCustomerAuth } from "../../context/CustomerAuthContext";
 import { useAuth } from "../../context/AuthContext";
 import { useSettings } from "../../context/SettingsContext";
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function Navbar() {
   const { cartCount } = useCart();
   const { announcementEnabled, announcementText } = useSettings();
+  const { language, isArabic, toggleLanguage, t } = useLanguage();
 
   const {
     customer,
@@ -81,7 +83,7 @@ export default function Navbar() {
   const isLoggedIn = isAdminLoggedIn || isCustomerLoggedIn;
 
   const cleanAnnouncementText =
-    announcementText?.trim() || "Wear comfort. Move different.";
+    announcementText?.trim() || t("nav.announcementFallback");
 
   const showAnnouncement =
     announcementEnabled && cleanAnnouncementText.length > 0;
@@ -110,7 +112,7 @@ export default function Navbar() {
               className="relative flex shrink-0 items-center gap-2 rounded-full border border-white/10 px-3 py-2 text-sm text-white transition hover:border-[#c8b89d]/60 sm:px-4"
             >
               <ShoppingBag size={17} />
-              <span className="hidden sm:inline">Cart</span>
+              <span className="hidden sm:inline">{t("nav.cart")}</span>
 
               {cartCount > 0 && (
                 <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#c8b89d] px-1 text-xs font-bold text-black">
@@ -119,20 +121,32 @@ export default function Navbar() {
               )}
             </Link>
 
+            <button
+              type="button"
+              onClick={toggleLanguage}
+              className="shrink-0 rounded-full border border-white/10 px-3 py-2 text-sm font-semibold text-[#c8b89d] transition hover:border-[#c8b89d]/60 hover:text-white sm:px-4"
+            >
+              {language === "en" ? "عربي" : "English"}
+            </button>
+
             <div ref={menuRef} className="relative shrink-0">
               <button
                 type="button"
                 onClick={() => setIsMenuOpen((prev) => !prev)}
                 className="flex items-center gap-2 rounded-full border border-white/10 px-3 py-2 text-sm text-white transition hover:border-[#c8b89d]/60 sm:px-4"
-                aria-label="Open menu"
+                aria-label={t("nav.openMenu")}
                 aria-expanded={isMenuOpen}
               >
                 {isMenuOpen ? <X size={17} /> : <Menu size={17} />}
-                <span className="hidden sm:inline">Menu</span>
+                <span className="hidden sm:inline">{t("nav.menu")}</span>
               </button>
 
               {isMenuOpen && (
-                <div className="absolute right-0 top-12 z-[9999] w-[calc(100vw-2rem)] max-w-72 overflow-hidden rounded-3xl border border-white/10 bg-[#080808]/95 p-3 shadow-2xl shadow-black/40 backdrop-blur-xl">
+                <div
+                  className={`absolute top-12 z-[9999] w-[calc(100vw-2rem)] max-w-72 overflow-hidden rounded-3xl border border-white/10 bg-[#080808]/95 p-3 shadow-2xl shadow-black/40 backdrop-blur-xl ${
+                    isArabic ? "left-0" : "right-0"
+                  }`}
+                >
                   {isAdminLoggedIn && (
                     <div className="mb-3 rounded-2xl border border-[#c8b89d]/20 bg-[#c8b89d]/10 p-4">
                       <div className="flex items-center gap-3">
@@ -145,7 +159,7 @@ export default function Navbar() {
                             {admin?.fullName || "AKM Admin"}
                           </p>
                           <p className="truncate text-xs text-[#c8b89d]">
-                            Admin account
+                            {t("nav.adminAccount")}
                           </p>
                         </div>
                       </div>
@@ -161,7 +175,7 @@ export default function Navbar() {
 
                         <div className="min-w-0">
                           <p className="truncate text-sm font-semibold text-white">
-                            {customer?.fullName || "AKM Customer"}
+                            {customer?.fullName || t("nav.customerFallback")}
                           </p>
                           <p className="truncate text-xs text-zinc-500">
                             {customer?.email}
@@ -173,7 +187,7 @@ export default function Navbar() {
 
                   <div className="grid gap-1">
                     <NavLink to="/" onClick={closeMenu} className={linkClass}>
-                      Home
+                      {t("nav.home")}
                     </NavLink>
 
                     <NavLink
@@ -181,7 +195,7 @@ export default function Navbar() {
                       onClick={closeMenu}
                       className={linkClass}
                     >
-                      Shop
+                      {t("nav.shop")}
                     </NavLink>
 
                     {isAdminLoggedIn && (
@@ -190,7 +204,7 @@ export default function Navbar() {
                         onClick={closeMenu}
                         className={linkClass}
                       >
-                        Admin Dashboard
+                        {t("nav.adminDashboard")}
                       </NavLink>
                     )}
 
@@ -200,7 +214,7 @@ export default function Navbar() {
                         onClick={closeMenu}
                         className={linkClass}
                       >
-                        My Orders
+                        {t("nav.myOrders")}
                       </NavLink>
                     )}
                   </div>
@@ -213,7 +227,7 @@ export default function Navbar() {
                           onClick={closeMenu}
                           className="rounded-2xl border border-white/10 px-4 py-3 text-center text-sm text-white transition hover:border-[#c8b89d]/60"
                         >
-                          Sign In
+                          {t("nav.signIn")}
                         </Link>
 
                         <Link
@@ -221,7 +235,7 @@ export default function Navbar() {
                           onClick={closeMenu}
                           className="rounded-2xl bg-[#f7f2ea] px-4 py-3 text-center text-sm font-semibold text-black transition hover:bg-white"
                         >
-                          Sign Up
+                          {t("nav.signUp")}
                         </Link>
                       </div>
                     ) : (
@@ -231,7 +245,7 @@ export default function Navbar() {
                         className="flex w-full items-center justify-center gap-2 rounded-2xl border border-red-400/20 px-4 py-3 text-sm text-red-200 transition hover:bg-red-500/10"
                       >
                         <LogOut size={16} />
-                        Logout
+                        {t("nav.logout")}
                       </button>
                     )}
                   </div>

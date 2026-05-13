@@ -12,6 +12,7 @@ import CartSummary from "../../components/cart/CartSummary";
 import PaymentMethodSelector from "../../components/checkout/PaymentMethodSelector";
 import TrustBadges from "../../components/checkout/TrustBadges";
 import SEO from "../../components/common/SEO";
+import { useLanguage } from "../../hooks/useLanguage";
 
 import {
   trackInitiateCheckout,
@@ -20,6 +21,7 @@ import {
 
 export default function Checkout() {
   const navigate = useNavigate();
+const { t } = useLanguage();
 const { cartItems, totals, coupon, clearCart } = useCart();
 const { customer: loggedInCustomer } = useCustomerAuth();
 
@@ -67,7 +69,7 @@ const { customer: loggedInCustomer } = useCustomerAuth();
     onError: (error) => {
       setFormError(
         error?.response?.data?.message ||
-          "Something went wrong while creating your order."
+          t("checkout.errors.create")
       );
     },
   });
@@ -82,14 +84,14 @@ const { customer: loggedInCustomer } = useCustomerAuth();
   };
 
   const validateForm = () => {
-    if (!customer.fullName.trim()) return "Full name is required.";
-    if (!customer.phone.trim()) return "Phone number is required.";
-    if (!customer.city.trim()) return "City/Governorate is required.";
-    if (!customer.address.trim()) return "Full address is required.";
-    if (!paymentMethod) return "Payment method is required.";
+    if (!customer.fullName.trim()) return t("checkout.errors.fullName");
+    if (!customer.phone.trim()) return t("checkout.errors.phone");
+    if (!customer.city.trim()) return t("checkout.errors.city");
+    if (!customer.address.trim()) return t("checkout.errors.address");
+    if (!paymentMethod) return t("checkout.errors.payment");
 
     if (paymentMethod === "Instapay" && !instapayTiming) {
-      return "Please choose when you will pay by Instapay.";
+      return t("checkout.errors.instapayTiming");
     }
 
     return "";
@@ -126,26 +128,28 @@ const { customer: loggedInCustomer } = useCustomerAuth();
     return (
       <main className="min-h-screen bg-[#050505] px-6 py-20 text-[#f7f2ea] md:px-12">
         <SEO
-          title="Checkout | AKM"
-          description="Complete your AKM order with guest checkout, Cash on Delivery, or Instapay."
+          title={t("checkout.seoTitle")}
+          description={t("checkout.seoDescription")}
         />
 
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-sm uppercase tracking-[0.3em] text-[#c8b89d]">
-            Checkout
+            {t("checkout.eyebrow")}
           </p>
 
-          <h1 className="mt-3 text-4xl font-semibold">Your cart is empty</h1>
+          <h1 className="mt-3 text-4xl font-semibold">
+            {t("checkout.emptyTitle")}
+          </h1>
 
           <p className="mt-4 text-zinc-400">
-            Add your AKM essentials first, then continue to checkout.
+            {t("checkout.emptyText")}
           </p>
 
           <Link
             to="/shop"
             className="mt-8 inline-block rounded-full bg-[#f7f2ea] px-7 py-3 font-medium text-black"
           >
-            Back to Shop
+            {t("checkout.backToShop")}
           </Link>
         </div>
       </main>
@@ -155,8 +159,8 @@ const { customer: loggedInCustomer } = useCustomerAuth();
   return (
     <main className="min-h-screen bg-[#050505] px-6 py-20 text-[#f7f2ea] md:px-12">
       <SEO
-        title="Checkout | AKM"
-        description="Complete your AKM order with guest checkout, Cash on Delivery, or Instapay."
+        title={t("checkout.seoTitle")}
+        description={t("checkout.seoDescription")}
       />
 
       <div className="mx-auto max-w-6xl">
@@ -165,20 +169,20 @@ const { customer: loggedInCustomer } = useCustomerAuth();
           className="inline-flex items-center gap-2 text-sm text-[#c8b89d] hover:text-white"
         >
           <ArrowLeft size={16} />
-          Back to cart
+          {t("checkout.backToCart")}
         </Link>
 
         <div className="mt-8">
           <p className="text-sm uppercase tracking-[0.3em] text-[#c8b89d]">
-            Checkout
+            {t("checkout.eyebrow")}
           </p>
 
           <h1 className="mt-3 text-4xl font-semibold md:text-6xl">
-            Complete your order
+            {t("checkout.title")}
           </h1>
 
           <p className="mt-4 max-w-2xl text-zinc-400">
-            Guest checkout. No account required.
+            {t("checkout.subtitle")}
           </p>
         </div>
 
@@ -188,55 +192,59 @@ const { customer: loggedInCustomer } = useCustomerAuth();
         >
           <div className="space-y-6">
             <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
-              <h2 className="text-2xl font-semibold">Customer Details</h2>
+              <h2 className="text-2xl font-semibold">
+                {t("checkout.customerDetails")}
+              </h2>
 
               <div className="mt-5 grid gap-4 md:grid-cols-2">
                 <div>
-                  <label className="text-sm text-zinc-300">Full name *</label>
+                  <label className="text-sm text-zinc-300">
+                    {t("checkout.fullName")}
+                  </label>
                   <input
                     name="fullName"
                     value={customer.fullName}
                     onChange={handleCustomerChange}
-                    placeholder="Your full name"
+                    placeholder={t("checkout.fullNamePlaceholder")}
                     className="mt-2 w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-[#c8b89d]/60"
                   />
                 </div>
 
                 <div>
                   <label className="text-sm text-zinc-300">
-                    Phone number *
+                    {t("checkout.phone")}
                   </label>
                   <input
                     name="phone"
                     value={customer.phone}
                     onChange={handleCustomerChange}
-                    placeholder="01xxxxxxxxx"
+                    placeholder={t("checkout.phonePlaceholder")}
                     className="mt-2 w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-[#c8b89d]/60"
                   />
                 </div>
 
                 <div>
                   <label className="text-sm text-zinc-300">
-                    Second phone, optional
+                    {t("checkout.secondPhone")}
                   </label>
                   <input
                     name="secondPhone"
                     value={customer.secondPhone}
                     onChange={handleCustomerChange}
-                    placeholder="Optional"
+                    placeholder={t("checkout.optionalPlaceholder")}
                     className="mt-2 w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-[#c8b89d]/60"
                   />
                 </div>
 
                 <div>
                   <label className="text-sm text-zinc-300">
-                    Email, optional
+                    {t("checkout.email")}
                   </label>
                   <input
                     name="email"
                     value={customer.email}
                     onChange={handleCustomerChange}
-                    placeholder="example@email.com"
+                    placeholder={t("checkout.emailPlaceholder")}
                     className="mt-2 w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-[#c8b89d]/60"
                   />
                 </div>
@@ -244,31 +252,33 @@ const { customer: loggedInCustomer } = useCustomerAuth();
             </div>
 
             <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
-              <h2 className="text-2xl font-semibold">Delivery Address</h2>
+              <h2 className="text-2xl font-semibold">
+                {t("checkout.deliveryAddress")}
+              </h2>
 
               <div className="mt-5 grid gap-4">
                 <div>
                   <label className="text-sm text-zinc-300">
-                    City/Governorate *
+                    {t("checkout.city")}
                   </label>
                   <input
                     name="city"
                     value={customer.city}
                     onChange={handleCustomerChange}
-                    placeholder="Cairo, Giza, Alexandria..."
+                    placeholder={t("checkout.cityPlaceholder")}
                     className="mt-2 w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-[#c8b89d]/60"
                   />
                 </div>
 
                 <div>
                   <label className="text-sm text-zinc-300">
-                    Full address *
+                    {t("checkout.address")}
                   </label>
                   <textarea
                     name="address"
                     value={customer.address}
                     onChange={handleCustomerChange}
-                    placeholder="Street, building, floor, apartment, landmark..."
+                    placeholder={t("checkout.addressPlaceholder")}
                     rows="4"
                     className="mt-2 w-full resize-none rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-[#c8b89d]/60"
                   />
@@ -276,13 +286,13 @@ const { customer: loggedInCustomer } = useCustomerAuth();
 
                 <div>
                   <label className="text-sm text-zinc-300">
-                    Order notes, optional
+                    {t("checkout.notes")}
                   </label>
                   <textarea
                     name="notes"
                     value={customer.notes}
                     onChange={handleCustomerChange}
-                    placeholder="Any delivery notes?"
+                    placeholder={t("checkout.notesPlaceholder")}
                     rows="3"
                     className="mt-2 w-full resize-none rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-[#c8b89d]/60"
                   />
@@ -316,12 +326,13 @@ const { customer: loggedInCustomer } = useCustomerAuth();
               disabled={orderMutation.isPending}
               className="mt-4 w-full rounded-full bg-[#f7f2ea] px-6 py-4 font-semibold text-black hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {orderMutation.isPending ? "Placing order..." : "Place Order"}
+              {orderMutation.isPending
+                ? t("checkout.placingOrder")
+                : t("checkout.placeOrder")}
             </button>
 
             <p className="mt-4 text-center text-xs leading-5 text-zinc-500">
-              By placing your order, you confirm that your information is
-              correct and AKM may contact you to confirm delivery.
+              {t("checkout.terms")}
             </p>
           </div>
         </form>

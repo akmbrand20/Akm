@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { formatCurrency } from "../../lib/formatCurrency";
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function CartItem({ item, onIncrease, onDecrease, onRemove }) {
+  const { t } = useLanguage();
   const maxStock = Number(item.maxStock || 0);
   const hasKnownMaxStock = Number.isFinite(maxStock) && maxStock > 0;
   const quantity = Number(item.quantity || 1);
@@ -72,8 +74,8 @@ export default function CartItem({ item, onIncrease, onDecrease, onRemove }) {
             }`}
           >
             {reachedMaxStock
-              ? `You reached the available stock: ${maxStock}.`
-              : `${maxStock} available.`}
+              ? t("cart.reachedStock", { count: maxStock })
+              : t("cart.available", { count: maxStock })}
           </p>
         )}
 
@@ -83,7 +85,7 @@ export default function CartItem({ item, onIncrease, onDecrease, onRemove }) {
           className="mt-4 inline-flex items-center gap-2 text-sm text-red-300 hover:text-red-200"
         >
           <Trash2 size={15} />
-          Remove
+          {t("common.remove")}
         </button>
       </div>
 

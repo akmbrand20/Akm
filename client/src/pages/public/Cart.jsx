@@ -7,8 +7,10 @@ import BundleDiscountNotice from "../../components/cart/BundleDiscountNotice";
 import FreeShippingBar from "../../components/cart/FreeShippingBar";
 import SEO from "../../components/common/SEO";
 import CouponBox from "../../components/cart/CouponBox";
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function Cart() {
+  const { t, isArabic } = useLanguage();
   const {
   cartItems,
   totals,
@@ -25,32 +27,34 @@ export default function Cart() {
     return (
       <main className="min-h-screen bg-[#050505] px-6 py-20 text-[#f7f2ea] md:px-12">
         <SEO
-  title="Cart | AKM"
-  description="Review your AKM cart, bundle savings, delivery fee, and checkout total."
+  title={t("cart.seoTitle")}
+  description={t("cart.seoDescription")}
 />
         <div className="mx-auto max-w-6xl">
           <p className="text-sm uppercase tracking-[0.3em] text-[#c8b89d]">
-            Cart
+            {t("cart.eyebrow")}
           </p>
 
-          <h1 className="mt-3 text-4xl font-semibold">Your cart</h1>
+          <h1 className="mt-3 text-4xl font-semibold">{t("cart.title")}</h1>
 
           <div className="mt-10 rounded-3xl border border-white/10 bg-white/[0.03] p-10 text-center">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white/[0.04]">
               <ShoppingBag />
             </div>
 
-            <h2 className="mt-5 text-2xl font-semibold">Your cart is empty</h2>
+            <h2 className="mt-5 text-2xl font-semibold">
+              {t("cart.emptyTitle")}
+            </h2>
 
             <p className="mt-3 text-zinc-400">
-              Start with a clean AKM essential and build your complete set.
+              {t("cart.emptyText")}
             </p>
 
             <Link
               to="/shop"
               className="mt-8 inline-block rounded-full bg-[#f7f2ea] px-7 py-3 font-medium text-black"
             >
-              Continue Shopping
+              {t("common.continueShopping")}
             </Link>
           </div>
         </div>
@@ -64,20 +68,22 @@ export default function Cart() {
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-sm uppercase tracking-[0.3em] text-[#c8b89d]">
-              Cart
+              {t("cart.eyebrow")}
             </p>
 
             <h1 className="mt-3 text-4xl font-semibold md:text-6xl">
-              Your cart
+              {t("cart.title")}
             </h1>
           </div>
 
           <button
             type="button"
             onClick={clearCart}
-            className="text-left text-sm text-red-300 hover:text-red-200 md:text-right"
+            className={`text-sm text-red-300 hover:text-red-200 ${
+              isArabic ? "text-right md:text-left" : "text-left md:text-right"
+            }`}
           >
-            Clear cart
+            {t("cart.clear")}
           </button>
         </div>
 
@@ -110,7 +116,7 @@ export default function Cart() {
               to="/shop"
               className="mt-4 block rounded-full border border-white/10 px-6 py-4 text-center font-medium text-white hover:border-[#c8b89d]/60"
             >
-              Continue Shopping
+              {t("common.continueShopping")}
             </Link>
           </div>
         </div>

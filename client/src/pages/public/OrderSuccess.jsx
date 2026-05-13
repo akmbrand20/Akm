@@ -6,9 +6,11 @@ import { BRAND } from "../../lib/constants";
 import { formatCurrency } from "../../lib/formatCurrency";
 import { getOrderByNumber } from "../../services/orderService";
 import SEO from "../../components/common/SEO";
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function OrderSuccess() {
   const { orderNumber } = useParams();
+  const { t, isArabic } = useLanguage();
 
   const {
     data: order,
@@ -23,7 +25,7 @@ export default function OrderSuccess() {
     return (
       <main className="min-h-screen bg-[#050505] px-6 py-20 text-[#f7f2ea]">
         <div className="mx-auto max-w-4xl text-zinc-400">
-          Loading order...
+          {t("orders.loading")}
         </div>
       </main>
     );
@@ -33,9 +35,9 @@ export default function OrderSuccess() {
     return (
       <main className="min-h-screen bg-[#050505] px-6 py-20 text-[#f7f2ea]">
         <div className="mx-auto max-w-4xl">
-          <p className="text-red-300">Order not found.</p>
+          <p className="text-red-300">{t("orders.notFound")}</p>
           <Link to="/shop" className="mt-5 inline-block text-[#c8b89d]">
-            Back to shop
+            {t("orders.backToShop")}
           </Link>
         </div>
       </main>
@@ -43,14 +45,14 @@ export default function OrderSuccess() {
   }
 
   const whatsappMessage = encodeURIComponent(
-    `Hello AKM, I placed order ${order.orderNumber} and I want to confirm it.`
+    t("orders.whatsappMessage", { orderNumber: order.orderNumber })
   );
 
   return (
     <main className="min-h-screen bg-[#050505] px-6 py-20 text-[#f7f2ea] md:px-12">
         <SEO
   title={`Order ${order.orderNumber} Confirmed | AKM`}
-  description="Your AKM order has been received successfully."
+  description={t("orders.successSeoDescription")}
 />
       <div className="mx-auto max-w-4xl">
         <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 text-center md:p-12">
@@ -59,38 +61,41 @@ export default function OrderSuccess() {
           </div>
 
           <p className="mt-8 text-sm uppercase tracking-[0.3em] text-[#c8b89d]">
-            Order Confirmed
+            {t("orders.confirmed")}
           </p>
 
           <h1 className="mt-3 text-4xl font-semibold md:text-5xl">
-            Thank you for your order.
+            {t("orders.thankYou")}
           </h1>
 
           <p className="mt-4 text-zinc-400">
-            Your order has been received. AKM will contact you to confirm the
-            details.
+            {t("orders.received")}
           </p>
 
-          <div className="mx-auto mt-8 max-w-md rounded-3xl border border-white/10 bg-black/30 p-5 text-left">
+          <div
+            className={`mx-auto mt-8 max-w-md rounded-3xl border border-white/10 bg-black/30 p-5 ${
+              isArabic ? "text-right" : "text-left"
+            }`}
+          >
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <span className="text-zinc-400">Order number</span>
+              <span className="text-zinc-400">{t("orders.number")}</span>
               <span className="font-semibold">{order.orderNumber}</span>
             </div>
 
             <div className="flex items-center justify-between border-b border-white/10 py-3">
-              <span className="text-zinc-400">Payment</span>
+              <span className="text-zinc-400">{t("common.payment")}</span>
               <span className="font-semibold">{order.paymentMethod}</span>
             </div>
 
             {order.instapayTiming && (
               <div className="flex items-center justify-between border-b border-white/10 py-3">
-                <span className="text-zinc-400">Instapay</span>
+                <span className="text-zinc-400">{t("orders.instapay")}</span>
                 <span className="font-semibold">{order.instapayTiming}</span>
               </div>
             )}
 
             <div className="flex items-center justify-between pt-3">
-              <span className="text-zinc-400">Total</span>
+              <span className="text-zinc-400">{t("common.total")}</span>
               <span className="font-semibold">{formatCurrency(order.total)}</span>
             </div>
           </div>
@@ -103,20 +108,20 @@ export default function OrderSuccess() {
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[#f7f2ea] px-7 py-3 font-semibold text-black"
             >
               <MessageCircle size={18} />
-              Confirm on WhatsApp
+              {t("orders.confirmWhatsapp")}
             </a>
 
             <Link
               to="/shop"
               className="rounded-full border border-white/10 px-7 py-3 font-medium text-white hover:border-[#c8b89d]/60"
             >
-              Continue Shopping
+              {t("common.continueShopping")}
             </Link>
           </div>
         </div>
 
         <div className="mt-8 rounded-3xl border border-white/10 bg-white/[0.03] p-6">
-          <h2 className="text-2xl font-semibold">Order Items</h2>
+          <h2 className="text-2xl font-semibold">{t("orders.items")}</h2>
 
           <div className="mt-5 space-y-3">
             {order.items.map((item, index) => (
