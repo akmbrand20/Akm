@@ -7,6 +7,7 @@ import {
   updatePaymentStatus,
 } from "../../services/adminOrderService";
 import { formatCurrency } from "../../lib/formatCurrency";
+import CancelOrderDialog from "../../components/admin/CancelOrderDialog";
 import OrderStatusBadge from "../../components/admin/OrderStatusBadge";
 import PaymentStatusBadge from "../../components/admin/PaymentStatusBadge";
 
@@ -26,6 +27,7 @@ export default function AdminOrders() {
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [orderToCancel, setOrderToCancel] = useState(null);
 
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ["adminOrders", { search, status }],
@@ -39,6 +41,7 @@ export default function AdminOrders() {
   const orderStatusMutation = useMutation({
     mutationFn: updateOrderStatus,
     onSuccess: () => {
+      setOrderToCancel(null);
       queryClient.invalidateQueries({ queryKey: ["adminOrders"] });
       queryClient.invalidateQueries({ queryKey: ["adminStats"] });
     },
@@ -51,6 +54,20 @@ export default function AdminOrders() {
       queryClient.invalidateQueries({ queryKey: ["adminStats"] });
     },
   });
+
+  const handleCancelOrder = (order) => {
+    if (order.orderStatus === "Cancelled") return;
+    setOrderToCancel(order);
+  };
+
+  const confirmCancelOrder = () => {
+    if (!orderToCancel) return;
+
+    orderStatusMutation.mutate({
+      id: orderToCancel._id,
+      orderStatus: "Cancelled",
+    });
+  };
 
   return (
     <div>
@@ -101,7 +118,7 @@ export default function AdminOrders() {
                   <th className="px-5 py-4 font-medium">Total</th>
                   <th className="px-5 py-4 font-medium">Order Status</th>
                   <th className="px-5 py-4 font-medium">Payment Status</th>
-                  <th className="px-5 py-4 font-medium">Details</th>
+                  <th className="px-5 py-4 font-medium">Actions</th>
                 </tr>
               </thead>
 
@@ -185,12 +202,28 @@ export default function AdminOrders() {
                     </td>
 
                     <td className="px-5 py-4">
-                      <Link
-                        to={`/admin/orders/${order._id}`}
-                        className="text-[#c8b89d] hover:text-white"
-                      >
-                        View
-                      </Link>
+                      <div className="flex flex-col items-start gap-3">
+                        {order.orderStatus !== "Cancelled" && (
+                          <button
+                            type="button"
+                            onClick={() => handleCancelOrder(order)}
+                            disabled={
+                              orderStatusMutation.isPending &&
+                              orderStatusMutation.variables?.id === order._id
+                            }
+                            className="rounded-full border border-red-400/30 bg-red-500/10 px-4 py-2 text-xs font-semibold text-red-200 transition hover:border-red-300/60 hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            Cancel
+                          </button>
+                        )}
+
+                        <Link
+                          to={`/admin/orders/${order._id}`}
+                          className="text-[#c8b89d] hover:text-white"
+                        >
+                          View
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -199,6 +232,14 @@ export default function AdminOrders() {
           </div>
         )}
       </div>
+
+      <CancelOrderDialog
+        order={orderToCancel}
+        isOpen={Boolean(orderToCancel)}
+        isLoading={orderStatusMutation.isPending}
+        onClose={() => setOrderToCancel(null)}
+        onConfirm={confirmCancelOrder}
+      />
     </div>
   );
 }

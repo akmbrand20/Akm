@@ -2,53 +2,53 @@ import { Link } from "react-router-dom";
 import { useSettings } from "../../context/SettingsContext";
 
 export default function Footer() {
-  const { phone, whatsappNumber, instagramUrl, tiktokUrl, facebookUrl } =
+  const { whatsappNumber, instagramUrl, tiktokUrl, facebookUrl } =
     useSettings();
 
   return (
-    <footer className="border-t border-white/10 bg-[#050505] px-6 py-10 text-[#f7f2ea] md:px-12">
+    <footer className="border-t border-[#eadfc9] bg-[#c8b89d] px-6 py-10 text-[#18120b] shadow-[0_-24px_70px_rgba(200,184,157,0.16)] md:px-12">
       <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-3">
         <div>
           <h2 className="text-2xl font-black">AKM</h2>
-          <p className="mt-3 max-w-md text-sm leading-6 text-zinc-400">
+          <p className="mt-3 max-w-md text-base leading-7 text-[#3c2f20] md:text-sm md:leading-6">
             Comfort you can feel. Clean everyday essentials designed for easy
             styling and premium movement.
           </p>
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold uppercase tracking-[0.25em] text-[#c8b89d]">
+          <h3 className="text-base font-bold uppercase tracking-[0.22em] text-[#4a3823] md:text-sm md:tracking-[0.25em]">
             Support
           </h3>
 
-          <div className="mt-4 grid gap-2 text-sm text-zinc-300">
-            <Link to="/policy/shipping" className="hover:text-white">
+          <div className="mt-4 grid gap-3 text-base font-medium text-[#241a10] md:gap-2 md:text-sm">
+            <Link to="/policy/shipping" className="hover:text-black">
               Shipping Policy
             </Link>
-            <Link to="/policy/returns" className="hover:text-white">
+            <Link to="/policy/returns" className="hover:text-black">
               Return & Exchange Policy
             </Link>
-            <Link to="/policy/privacy" className="hover:text-white">
+            <Link to="/policy/privacy" className="hover:text-black">
               Privacy Policy
             </Link>
-            <Link to="/policy/terms" className="hover:text-white">
+            <Link to="/policy/terms" className="hover:text-black">
               Terms & Conditions
             </Link>
           </div>
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold uppercase tracking-[0.25em] text-[#c8b89d]">
+          <h3 className="text-base font-bold uppercase tracking-[0.22em] text-[#4a3823] md:text-sm md:tracking-[0.25em]">
             Social
           </h3>
 
-          <div className="mt-4 grid gap-2 text-sm text-zinc-300">
+          <div className="mt-4 grid gap-3 text-base font-medium text-[#241a10] md:gap-2 md:text-sm">
             {instagramUrl && (
               <a
                 href={instagramUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="hover:text-white"
+                className="hover:text-black"
               >
                 Instagram
               </a>
@@ -59,7 +59,7 @@ export default function Footer() {
                 href={tiktokUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="hover:text-white"
+                className="hover:text-black"
               >
                 TikTok
               </a>
@@ -70,7 +70,7 @@ export default function Footer() {
                 href={facebookUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="hover:text-white"
+                className="hover:text-black"
               >
                 Facebook
               </a>
@@ -80,7 +80,7 @@ export default function Footer() {
               href={`https://wa.me/${whatsappNumber}`}
               target="_blank"
               rel="noreferrer"
-              className="hover:text-white"
+              className="hover:text-black"
             >
               WhatsApp
             </a>
@@ -88,7 +88,7 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="mx-auto mt-10 max-w-6xl border-t border-white/10 pt-6 text-sm text-zinc-500">
+      <div className="mx-auto mt-10 max-w-6xl border-t border-[#4a3823]/25 pt-6 text-sm font-medium text-[#4a3823]">
         © {new Date().getFullYear()} AKM. All rights reserved.
       </div>
     </footer>

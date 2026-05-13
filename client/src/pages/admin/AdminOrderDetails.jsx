@@ -1,13 +1,20 @@
 import { Link, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
-import { getAdminOrderById } from "../../services/adminOrderService";
+import {
+  getAdminOrderById,
+  updateOrderStatus,
+} from "../../services/adminOrderService";
 import { formatCurrency } from "../../lib/formatCurrency";
+import CancelOrderDialog from "../../components/admin/CancelOrderDialog";
 import OrderStatusBadge from "../../components/admin/OrderStatusBadge";
 import PaymentStatusBadge from "../../components/admin/PaymentStatusBadge";
 
 export default function AdminOrderDetails() {
   const { id } = useParams();
+  const queryClient = useQueryClient();
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
 
   const {
     data: order,
@@ -17,6 +24,30 @@ export default function AdminOrderDetails() {
     queryKey: ["adminOrder", id],
     queryFn: () => getAdminOrderById(id),
   });
+
+  const orderStatusMutation = useMutation({
+    mutationFn: updateOrderStatus,
+    onSuccess: () => {
+      setIsCancelDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["adminOrder", id] });
+      queryClient.invalidateQueries({ queryKey: ["adminOrders"] });
+      queryClient.invalidateQueries({ queryKey: ["adminStats"] });
+    },
+  });
+
+  const handleCancelOrder = () => {
+    if (!order || order.orderStatus === "Cancelled") return;
+    setIsCancelDialogOpen(true);
+  };
+
+  const confirmCancelOrder = () => {
+    if (!order) return;
+
+    orderStatusMutation.mutate({
+      id: order._id,
+      orderStatus: "Cancelled",
+    });
+  };
 
   if (isLoading) {
     return <p className="text-zinc-400">Loading order...</p>;
@@ -44,9 +75,20 @@ export default function AdminOrderDetails() {
           <h1 className="mt-3 text-4xl font-semibold">{order.orderNumber}</h1>
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <OrderStatusBadge status={order.orderStatus} />
           <PaymentStatusBadge status={order.paymentStatus} />
+
+          {order.orderStatus !== "Cancelled" && (
+            <button
+              type="button"
+              onClick={handleCancelOrder}
+              disabled={orderStatusMutation.isPending}
+              className="rounded-full border border-red-400/30 bg-red-500/10 px-5 py-2 text-sm font-semibold text-red-200 transition hover:border-red-300/60 hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Cancel Order
+            </button>
+          )}
         </div>
       </div>
 
@@ -226,6 +268,14 @@ export default function AdminOrderDetails() {
           </div>
         </div>
       </div>
+
+      <CancelOrderDialog
+        order={order}
+        isOpen={isCancelDialogOpen}
+        isLoading={orderStatusMutation.isPending}
+        onClose={() => setIsCancelDialogOpen(false)}
+        onConfirm={confirmCancelOrder}
+      />
     </div>
   );
 }

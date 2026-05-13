@@ -150,6 +150,10 @@ table {
 }
 
 @media (max-width: 640px) {
+  html {
+    font-size: 17px;
+  }
+
   .akm-announcement-bar {
     height: 30px;
   }

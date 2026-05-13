@@ -66,11 +66,11 @@ export default function Home() {
 
       <section className="mx-auto max-w-6xl px-5 py-14 md:px-12 md:py-16">
         <div className="mb-8">
-          <p className="text-sm uppercase tracking-[0.3em] text-[#c8b89d]">
+          <p className="text-lg font-semibold uppercase tracking-[0.24em] text-[#c8b89d] sm:text-sm sm:tracking-[0.3em]">
             Bundle Offers
           </p>
           <h2 className="mt-3 text-3xl font-semibold md:text-4xl">
-            Better value, cleaner rotation.
+            Better value, built for daily wear.
           </h2>
         </div>
 
@@ -118,7 +118,7 @@ export default function Home() {
 
       <section className="mx-auto max-w-6xl px-5 py-14 md:px-12 md:py-16">
         <div className="mb-8">
-          <p className="text-sm uppercase tracking-[0.3em] text-[#c8b89d]">
+          <p className="text-lg font-semibold uppercase tracking-[0.24em] text-[#c8b89d] sm:text-sm sm:tracking-[0.3em]">
             Featured Collection
           </p>
           <h2 className="mt-3 text-3xl font-semibold md:text-4xl">

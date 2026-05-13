@@ -4,6 +4,7 @@ const { generateOrderNumber } = require("../services/orderNumberService");
 const {
   validateAndBuildOrderItems,
   decreaseStockAfterOrder,
+  increaseStockAfterOrderCancellation,
 } = require("../services/stockService");
 const { calculateTotals } = require("../utils/calculateTotals");
 const { sendMetaPurchaseEvent } = require("../services/metaCapiService");
@@ -318,18 +319,41 @@ const updateOrderStatus = async (req, res) => {
     });
   }
 
-  const order = await Order.findByIdAndUpdate(
-    req.params.id,
-    { orderStatus },
-    { new: true }
-  );
-
+  const order = await Order.findById(req.params.id);
   if (!order) {
     return res.status(404).json({
       success: false,
       message: "Order not found.",
     });
   }
+
+  const wasCancelled = order.orderStatus === "Cancelled";
+  const willBeCancelled = orderStatus === "Cancelled";
+
+  if (!wasCancelled && willBeCancelled) {
+    await increaseStockAfterOrderCancellation(order.items);
+
+    if (order.coupon?.code) {
+      await Coupon.findOneAndUpdate(
+        { code: order.coupon.code, usedCount: { $gt: 0 } },
+        { $inc: { usedCount: -1 } }
+      );
+    }
+  }
+
+  if (wasCancelled && !willBeCancelled) {
+    await decreaseStockAfterOrder(order.items);
+
+    if (order.coupon?.code) {
+      await Coupon.findOneAndUpdate(
+        { code: order.coupon.code },
+        { $inc: { usedCount: 1 } }
+      );
+    }
+  }
+
+  order.orderStatus = orderStatus;
+  await order.save();
 
   res.json({
     success: true,
@@ -373,10 +397,13 @@ const updatePaymentStatus = async (req, res) => {
 const getAdminStats = async (req, res) => {
   const orders = await Order.find();
 
-  const totalOrders = orders.length;
+  const activeOrders = orders.filter(
+    (order) => order.orderStatus !== "Cancelled"
+  );
 
-  const totalRevenue = orders
-    .filter((order) => order.orderStatus !== "Cancelled")
+  const totalOrders = activeOrders.length;
+
+  const totalRevenue = activeOrders
     .reduce((total, order) => total + Number(order.total || 0), 0);
 
   const pendingOrders = orders.filter(

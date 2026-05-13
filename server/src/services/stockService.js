@@ -89,7 +89,24 @@ const decreaseStockAfterOrder = async (items = []) => {
   }
 };
 
+const increaseStockAfterOrderCancellation = async (items = []) => {
+  for (const item of items) {
+    const product = await Product.findById(item.productId);
+
+    if (!product) continue;
+
+    const { size } = findVariant(product, item.color, item.size);
+
+    if (!size) continue;
+
+    size.stock = Number(size.stock || 0) + Number(item.quantity || 0);
+
+    await product.save();
+  }
+};
+
 module.exports = {
   validateAndBuildOrderItems,
   decreaseStockAfterOrder,
+  increaseStockAfterOrderCancellation,
 };
