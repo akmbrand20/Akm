@@ -256,8 +256,16 @@ export default function Navbar() {
         </nav>
 
         {showAnnouncement && (
-          <div className="akm-announcement-bar">
-            <div className="akm-announcement-track">
+          <div
+            className={`akm-announcement-bar ${
+              isArabic ? "akm-announcement-bar-ar" : ""
+            }`}
+          >
+            <div
+              className={`akm-announcement-track ${
+                isArabic ? "akm-announcement-track-ar" : ""
+              }`}
+            >
               <span>{cleanAnnouncementText}</span>
             </div>
           </div>

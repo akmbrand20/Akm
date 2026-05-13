@@ -139,6 +139,22 @@ table {
   text-transform: uppercase;
 }
 
+.akm-announcement-bar-ar {
+  direction: ltr;
+}
+
+.akm-announcement-track-ar {
+  direction: rtl;
+  animation: akm-announcement-ar-right-to-left 13s linear infinite;
+}
+
+.akm-announcement-track-ar span {
+  font-size: 0.8rem;
+  letter-spacing: 0;
+  text-transform: none;
+  unicode-bidi: plaintext;
+}
+
 @keyframes akm-announcement-left-to-right {
   0% {
     transform: translate3d(-100%, 0, 0);
@@ -146,6 +162,16 @@ table {
 
   100% {
     transform: translate3d(100vw, 0, 0);
+  }
+}
+
+@keyframes akm-announcement-ar-right-to-left {
+  0% {
+    transform: translate3d(100vw, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(-100%, 0, 0);
   }
 }
 
@@ -166,6 +192,15 @@ table {
     padding-inline: 1rem;
     font-size: 0.62rem;
     letter-spacing: 0.22em;
+  }
+
+  .akm-announcement-track-ar {
+    animation-duration: 11s;
+  }
+
+  .akm-announcement-track-ar span {
+    font-size: 0.74rem;
+    letter-spacing: 0;
   }
 }
 
