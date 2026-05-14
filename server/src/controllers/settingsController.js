@@ -42,6 +42,7 @@ const updateSettings = async (req, res) => {
     whatsappNumber,
     phone,
     instapayNumber,
+    vodafoneCashNumber,
     instagramUrl,
     tiktokUrl,
     facebookUrl,
@@ -75,6 +76,9 @@ const updateSettings = async (req, res) => {
   if (whatsappNumber !== undefined) settings.whatsappNumber = whatsappNumber;
   if (phone !== undefined) settings.phone = phone;
   if (instapayNumber !== undefined) settings.instapayNumber = instapayNumber;
+  if (vodafoneCashNumber !== undefined) {
+    settings.vodafoneCashNumber = vodafoneCashNumber;
+  }
 
   if (instagramUrl !== undefined) settings.instagramUrl = instagramUrl;
   if (tiktokUrl !== undefined) settings.tiktokUrl = tiktokUrl;

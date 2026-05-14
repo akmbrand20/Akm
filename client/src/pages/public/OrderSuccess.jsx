@@ -89,7 +89,9 @@ export default function OrderSuccess() {
 
             {order.instapayTiming && (
               <div className="flex items-center justify-between border-b border-white/10 py-3">
-                <span className="text-zinc-400">{t("orders.instapay")}</span>
+                <span className="text-zinc-400">
+                  {t("orders.paymentTiming")}
+                </span>
                 <span className="font-semibold">{order.instapayTiming}</span>
               </div>
             )}

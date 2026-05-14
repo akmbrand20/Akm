@@ -38,7 +38,11 @@ export function SettingsProvider({ children }) {
     whatsappNumber:
       settings?.whatsappNumber?.replace(/\D/g, "") || BRAND.whatsappNumber,
 
-    instapayNumber: settings?.instapayNumber || "01014318607",
+    instapayNumber: settings?.instapayNumber || "+201014318607",
+    vodafoneCashNumber:
+      settings?.vodafoneCashNumber ||
+      settings?.instapayNumber ||
+      "+201014318607",
 
     instagramUrl: settings?.instagramUrl || BRAND.instagram,
     tiktokUrl: settings?.tiktokUrl || BRAND.tiktok,

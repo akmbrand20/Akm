@@ -49,10 +49,14 @@ const createOrder = async (req, res) => {
       });
     }
 
-    if (paymentMethod === "Instapay" && !instapayTiming) {
+    const requiresPaymentTiming = ["Instapay", "Vodafone Cash"].includes(
+      paymentMethod
+    );
+
+    if (requiresPaymentTiming && !instapayTiming) {
       return res.status(400).json({
         success: false,
-        message: "Please choose when you will pay by Instapay.",
+        message: "Please choose when you will pay.",
       });
     }
 
@@ -109,7 +113,7 @@ const totals = calculateTotals(
 
     let paymentStatus = "Unpaid";
 
-    if (paymentMethod === "Instapay" && instapayTiming === "Pay Now") {
+    if (requiresPaymentTiming && instapayTiming === "Pay Now") {
       paymentStatus = "Pending Verification";
     }
 
@@ -135,7 +139,7 @@ total: totals.total,
 appliedOffer: totals.appliedOffer,
 coupon: appliedCoupon,
 paymentMethod,
-      instapayTiming: paymentMethod === "Instapay" ? instapayTiming : "",
+      instapayTiming: requiresPaymentTiming ? instapayTiming : "",
       transactionReference: transactionReference || "",
       paymentStatus,
       orderStatus: "Pending",

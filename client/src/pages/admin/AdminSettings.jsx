@@ -39,7 +39,11 @@ export default function AdminSettings() {
         freeShippingThreshold: settings.freeShippingThreshold ?? "",
         whatsappNumber: settings.whatsappNumber || "+201014318607",
         phone: settings.phone || "+201014318607",
-        instapayNumber: settings.instapayNumber || "01014318607",
+        instapayNumber: settings.instapayNumber || "+201014318607",
+        vodafoneCashNumber:
+          settings.vodafoneCashNumber ||
+          settings.instapayNumber ||
+          "+201014318607",
         instagramUrl: settings.instagramUrl || "",
         tiktokUrl: settings.tiktokUrl || "",
         facebookUrl: settings.facebookUrl || "",
@@ -329,7 +333,7 @@ export default function AdminSettings() {
                 />
               </div>
 
-              <div className="md:col-span-2">
+              <div>
                 <label className="text-sm text-zinc-300">
                   Instapay number
                 </label>
@@ -337,7 +341,20 @@ export default function AdminSettings() {
                   name="instapayNumber"
                   value={form.instapayNumber}
                   onChange={handleChange}
-                  placeholder="01014318607"
+                  placeholder="+201014318607"
+                  className="mt-2 w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-[#c8b89d]/60"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-zinc-300">
+                  Vodafone Cash number
+                </label>
+                <input
+                  name="vodafoneCashNumber"
+                  value={form.vodafoneCashNumber}
+                  onChange={handleChange}
+                  placeholder="+201014318607"
                   className="mt-2 w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-[#c8b89d]/60"
                 />
               </div>

@@ -51,6 +51,12 @@ const siteSettingsSchema = new mongoose.Schema(
       trim: true,
     },
 
+    vodafoneCashNumber: {
+      type: String,
+      default: "+201014318607",
+      trim: true,
+    },
+
     instagramUrl: {
       type: String,
       default: "https://www.instagram.com/akmbrand74",

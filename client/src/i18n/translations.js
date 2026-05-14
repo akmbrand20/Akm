@@ -143,7 +143,7 @@ export const translations = {
     checkout: {
       seoTitle: "Checkout | AKM",
       seoDescription:
-        "Complete your AKM order with guest checkout, Cash on Delivery, or Instapay.",
+        "Complete your AKM order with guest checkout, Cash on Delivery, Instapay, or Vodafone Cash.",
       eyebrow: "Checkout",
       emptyTitle: "Your cart is empty",
       emptyText: "Add your AKM essentials first, then continue to checkout.",
@@ -178,7 +178,7 @@ export const translations = {
         city: "City/Governorate is required.",
         address: "Full address is required.",
         payment: "Payment method is required.",
-        instapayTiming: "Please choose when you will pay by Instapay.",
+        instapayTiming: "Please choose when you will pay.",
       },
     },
     payment: {
@@ -187,18 +187,24 @@ export const translations = {
       codText: "Pay in cash when your order arrives.",
       instapay: "Instapay",
       instapayText: "Pay now or choose to pay by Instapay on delivery.",
-      timing: "Instapay Timing",
+      vodafoneCash: "Vodafone Cash",
+      vodafoneCashText: "Pay now or choose to pay with Vodafone Cash on delivery.",
+      timing: "Payment Timing",
       payNow: "Pay Now",
       payOnDelivery: "Pay on Delivery",
       number: "Instapay Number",
+      paymentNumber: "Payment Number",
       copy: "Copy",
       qrAlt: "Instapay QR",
       qrFallback:
         "Instapay QR will be added soon. You can still place your order and AKM will confirm payment details.",
       reference: "Transaction reference, optional",
+      vodafoneReference: "Vodafone Cash reference, optional",
       referencePlaceholder: "Example: payment reference or note",
       pending:
         "The order will be marked as pending payment verification until AKM confirms the transfer.",
+      vodafonePending:
+        "Your order will be marked as pending payment verification until AKM confirms the Vodafone Cash transfer.",
     },
     trust: {
       deliveryTitle: "Delivery in Egypt",
@@ -314,6 +320,7 @@ export const translations = {
         "Your order has been received. AKM will contact you to confirm the details.",
       number: "Order number",
       instapay: "Instapay",
+      paymentTiming: "Payment timing",
       confirmWhatsapp: "Confirm on WhatsApp",
       whatsappMessage:
         "Hello AKM, I placed order {orderNumber} and I want to confirm it.",
@@ -480,7 +487,7 @@ export const translations = {
     },
     checkout: {
       seoTitle: "إتمام الطلب | AKM",
-      seoDescription: "أكمل طلب AKM بالدفع عند الاستلام أو إنستاباي.",
+      seoDescription: "أكمل طلب AKM بالدفع عند الاستلام أو إنستاباي أو فودافون كاش.",
       eyebrow: "إتمام الطلب",
       emptyTitle: "السلة فارغة",
       emptyText: "أضف منتجات AKM أولا ثم تابع لإتمام الطلب.",
@@ -515,7 +522,7 @@ export const translations = {
         city: "المدينة/المحافظة مطلوبة.",
         address: "العنوان الكامل مطلوب.",
         payment: "طريقة الدفع مطلوبة.",
-        instapayTiming: "اختر موعد الدفع عبر إنستاباي.",
+        instapayTiming: "اختر موعد الدفع.",
       },
     },
     payment: {
@@ -524,17 +531,23 @@ export const translations = {
       codText: "ادفع نقدا عند وصول الطلب.",
       instapay: "إنستاباي",
       instapayText: "ادفع الآن أو اختر الدفع بإنستاباي عند الاستلام.",
-      timing: "موعد الدفع بإنستاباي",
+      vodafoneCash: "فودافون كاش",
+      vodafoneCashText: "حوّل على نفس رقم الدفع الخاص بـ AKM قبل التأكيد.",
+      timing: "موعد الدفع",
       payNow: "ادفع الآن",
       payOnDelivery: "ادفع عند الاستلام",
       number: "رقم إنستاباي",
+      paymentNumber: "رقم الدفع",
       copy: "نسخ",
       qrAlt: "رمز QR لإنستاباي",
       qrFallback:
         "سيتم إضافة QR إنستاباي قريبا. يمكنك إتمام الطلب وسنؤكد تفاصيل الدفع.",
       reference: "مرجع التحويل، اختياري",
+      vodafoneReference: "مرجع تحويل فودافون كاش، اختياري",
       referencePlaceholder: "مثال: رقم العملية أو ملاحظة الدفع",
       pending: "سيظل الطلب قيد مراجعة الدفع حتى تؤكد AKM التحويل.",
+      vodafonePending:
+        "سيظل الطلب قيد مراجعة الدفع حتى تؤكد AKM تحويل فودافون كاش.",
     },
     trust: {
       deliveryTitle: "توصيل داخل مصر",
@@ -645,6 +658,7 @@ export const translations = {
       received: "تم استلام طلبك. ستتواصل AKM معك لتأكيد التفاصيل.",
       number: "رقم الطلب",
       instapay: "إنستاباي",
+      paymentTiming: "موعد الدفع",
       confirmWhatsapp: "تأكيد عبر واتساب",
       whatsappMessage:
         "مرحبا AKM، قمت بإرسال طلب رقم {orderNumber} وأريد تأكيده.",

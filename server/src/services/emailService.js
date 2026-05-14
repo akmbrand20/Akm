@@ -167,7 +167,7 @@ const sendOwnerNewOrderEmail = async (order) => {
           <p><strong>Payment method:</strong> ${order.paymentMethod}</p>
           ${
             order.instapayTiming
-              ? `<p><strong>Instapay timing:</strong> ${order.instapayTiming}</p>`
+              ? `<p><strong>Payment timing:</strong> ${order.instapayTiming}</p>`
               : ""
           }
           ${
@@ -260,7 +260,12 @@ const sendCustomerOrderConfirmationEmail = async (order) => {
           <p><strong>Payment method:</strong> ${order.paymentMethod}</p>
           ${
             order.instapayTiming
-              ? `<p><strong>Instapay:</strong> ${order.instapayTiming}</p>`
+              ? `<p><strong>Payment timing:</strong> ${order.instapayTiming}</p>`
+              : ""
+          }
+          ${
+            order.transactionReference
+              ? `<p><strong>Transaction reference:</strong> ${order.transactionReference}</p>`
               : ""
           }
           <p><strong>City:</strong> ${order.customer.city}</p>

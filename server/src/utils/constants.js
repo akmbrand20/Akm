@@ -12,7 +12,7 @@ const ORDER_STATUSES = [
   "Cancelled",
 ];
 
-const PAYMENT_METHODS = ["Cash on Delivery", "Instapay"];
+const PAYMENT_METHODS = ["Cash on Delivery", "Instapay", "Vodafone Cash"];
 
 const INSTAPAY_TIMINGS = ["Pay Now", "Pay on Delivery", ""];
 

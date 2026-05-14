@@ -252,6 +252,8 @@ const settings = {
   freeShippingThreshold: null,
   whatsappNumber: "+201014318607",
   phone: "+201014318607",
+  instapayNumber: "+201014318607",
+  vodafoneCashNumber: "+201014318607",
   instagramUrl: "https://www.instagram.com/akmbrand74",
   tiktokUrl: "https://www.tiktok.com/@akmbrand74",
   facebookUrl: "https://www.facebook.com/share/1JXQWC1Kw9/?mibextid=wwXIfr",

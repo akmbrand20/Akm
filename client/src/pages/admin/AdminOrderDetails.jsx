@@ -210,7 +210,7 @@ export default function AdminOrderDetails() {
               </p>
               {order.instapayTiming && (
                 <p className="mt-2">
-                  <span className="text-[#c8b89d]">Instapay:</span>{" "}
+                  <span className="text-[#c8b89d]">Payment timing:</span>{" "}
                   {order.instapayTiming}
                 </p>
               )}

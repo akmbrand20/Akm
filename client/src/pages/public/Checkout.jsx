@@ -84,13 +84,17 @@ const { customer: loggedInCustomer } = useCustomerAuth();
   };
 
   const validateForm = () => {
+    const requiresPaymentTiming = ["Instapay", "Vodafone Cash"].includes(
+      paymentMethod
+    );
+
     if (!customer.fullName.trim()) return t("checkout.errors.fullName");
     if (!customer.phone.trim()) return t("checkout.errors.phone");
     if (!customer.city.trim()) return t("checkout.errors.city");
     if (!customer.address.trim()) return t("checkout.errors.address");
     if (!paymentMethod) return t("checkout.errors.payment");
 
-    if (paymentMethod === "Instapay" && !instapayTiming) {
+    if (requiresPaymentTiming && !instapayTiming) {
       return t("checkout.errors.instapayTiming");
     }
 
@@ -109,14 +113,17 @@ const { customer: loggedInCustomer } = useCustomerAuth();
     }
 
     const trackingEventId = generateEventId("purchase");
+    const requiresPaymentTiming = ["Instapay", "Vodafone Cash"].includes(
+      paymentMethod
+    );
 
     orderMutation.mutate({
       customer,
       items: cartItems,
       paymentMethod,
-      instapayTiming: paymentMethod === "Instapay" ? instapayTiming : "",
+      instapayTiming: requiresPaymentTiming ? instapayTiming : "",
       transactionReference:
-        paymentMethod === "Instapay" && instapayTiming === "Pay Now"
+        requiresPaymentTiming && instapayTiming === "Pay Now"
           ? transactionReference
           : "",
       trackingEventId,
