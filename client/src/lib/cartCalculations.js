@@ -61,6 +61,66 @@ const getCompleteSetsForBundle = (items = [], bundleProducts = []) => {
   return Math.min(...quantities);
 };
 
+const getOfferProductIds = (products = []) => {
+  return Array.isArray(products)
+    ? products.map(normalizeProductId).filter(Boolean)
+    : [];
+};
+
+const getFreeDeliveryOffer = (items = [], offers = []) => {
+  if (!items.length) {
+    return {
+      unlocked: false,
+      offerTitle: "",
+    };
+  }
+
+  const activeFreeDeliveryOffers = offers.filter(
+    (offer) =>
+      offer &&
+      offer.isActive !== false &&
+      offer.freeDelivery &&
+      ["bundle", "product"].includes(offer.type)
+  );
+
+  for (const offer of activeFreeDeliveryOffers) {
+    if (offer.type === "bundle") {
+      const bundleProducts = getOfferProductIds(offer.bundleProducts);
+      const sets = Number(offer.sets || 0);
+
+      if (
+        sets > 0 &&
+        bundleProducts.length >= 2 &&
+        getCompleteSetsForBundle(items, bundleProducts) >= sets
+      ) {
+        return {
+          unlocked: true,
+          offerTitle: offer.title || "",
+        };
+      }
+    }
+
+    if (offer.type === "product") {
+      const targetProducts = getOfferProductIds(offer.targetProducts);
+      const hasTargetProduct = items.some((item) =>
+        targetProducts.includes(normalizeProductId(item.productId))
+      );
+
+      if (hasTargetProduct) {
+        return {
+          unlocked: true,
+          offerTitle: offer.title || "",
+        };
+      }
+    }
+  }
+
+  return {
+    unlocked: false,
+    offerTitle: "",
+  };
+};
+
 export const calculateBundleDiscount = (items = [], bundleOffers = []) => {
   const activeBundleOffers = normalizeBundleOffers(bundleOffers);
 
@@ -108,13 +168,16 @@ export const calculateCartTotals = (
   const afterBundle = Math.max(0, subtotal - bundle.discount);
   const safeCouponDiscount = Math.min(Number(couponDiscount || 0), afterBundle);
   const afterAllDiscounts = Math.max(0, afterBundle - safeCouponDiscount);
+  const freeDeliveryOffer = getFreeDeliveryOffer(items, bundleOffers);
 
   const hasItems = items.length > 0;
-  const freeShippingUnlocked =
+  const thresholdFreeShippingUnlocked =
     hasItems &&
     freeShippingThreshold !== null &&
     Number(freeShippingThreshold) > 0 &&
     afterAllDiscounts >= Number(freeShippingThreshold);
+  const freeShippingUnlocked =
+    thresholdFreeShippingUnlocked || freeDeliveryOffer.unlocked;
 
   const shippingFee =
     hasItems && !freeShippingUnlocked ? Number(deliveryFee) : 0;
@@ -132,6 +195,8 @@ export const calculateCartTotals = (
     completeSets: bundle.completeSets,
     bundleMessage: bundle.message,
     freeShippingUnlocked,
+    freeDeliveryByOffer: freeDeliveryOffer.unlocked,
+    freeDeliveryOffer: freeDeliveryOffer.offerTitle,
     freeShippingThreshold,
     total,
     subtotalAfterBundle: afterBundle,

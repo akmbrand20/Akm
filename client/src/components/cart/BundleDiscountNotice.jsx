@@ -241,6 +241,15 @@ export default function BundleDiscountNotice({
                       price: formatCurrency(offer.offerPrice),
                     })}
                   </span>
+                  {offer.freeDelivery && (
+                    <span
+                      className={`mt-1 block text-xs font-semibold ${
+                        active ? "text-black" : "text-emerald-200"
+                      }`}
+                    >
+                      {t("bundle.freeDelivery")}
+                    </span>
+                  )}
                 </span>
                 <PackagePlus size={18} />
               </button>

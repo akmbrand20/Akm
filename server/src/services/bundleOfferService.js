@@ -24,7 +24,9 @@ const getDefaultBundleProducts = async () => {
 
 const hydrateLegacyBundleOffers = async (offers = []) => {
   const needsFallback = offers.some(
-    (offer) => !Array.isArray(offer.bundleProducts) || offer.bundleProducts.length < 2
+    (offer) =>
+      offer.type === "bundle" &&
+      (!Array.isArray(offer.bundleProducts) || offer.bundleProducts.length < 2)
   );
 
   if (!needsFallback) return offers;
@@ -34,6 +36,8 @@ const hydrateLegacyBundleOffers = async (offers = []) => {
   if (defaultBundleProducts.length < 2) return offers;
 
   return offers.map((offer) => {
+    if (offer.type !== "bundle") return offer;
+
     if (Array.isArray(offer.bundleProducts) && offer.bundleProducts.length >= 2) {
       return offer;
     }
@@ -47,11 +51,11 @@ const hydrateLegacyBundleOffers = async (offers = []) => {
   });
 };
 
-const getActiveBundleOffers = async () => {
+const getActiveOfferQuery = (typeFilter) => {
   const now = new Date();
 
-  const offers = await Offer.find({
-    type: "bundle",
+  return {
+    type: typeFilter,
     isActive: true,
     $and: [
       {
@@ -61,11 +65,28 @@ const getActiveBundleOffers = async () => {
         $or: [{ endsAt: null }, { endsAt: { $gte: now } }],
       },
     ],
-  }).sort({ sets: -1, savings: -1, sortOrder: 1 });
+  };
+};
+
+const getActiveBundleOffers = async () => {
+  const offers = await Offer.find(getActiveOfferQuery("bundle")).sort({
+    sets: -1,
+    savings: -1,
+    sortOrder: 1,
+  });
+
+  return hydrateLegacyBundleOffers(offers);
+};
+
+const getActiveCheckoutOffers = async () => {
+  const offers = await Offer.find(
+    getActiveOfferQuery({ $in: ["bundle", "product"] })
+  ).sort({ sets: -1, savings: -1, sortOrder: 1, createdAt: -1 });
 
   return hydrateLegacyBundleOffers(offers);
 };
 
 module.exports = {
   getActiveBundleOffers,
+  getActiveCheckoutOffers,
 };

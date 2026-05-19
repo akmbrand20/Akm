@@ -139,10 +139,12 @@ export const translations = {
         "Bundle buttons will appear when two bundle products are configured.",
       noCartCandidates:
         "Add one of the bundle products to your cart first.",
+      freeDelivery: "Free delivery",
     },
     shipping: {
       unlocked: "Free Delivery Unlocked",
       qualifies: "Your order qualifies for free delivery.",
+      offerUnlocked: "Free delivery unlocked by {offer}.",
       offer: "Delivery Offer",
       addMore: "Add {amount} more to unlock free delivery.",
       startsAt: "Free delivery starts at {amount}.",

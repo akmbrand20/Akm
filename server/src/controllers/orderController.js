@@ -14,7 +14,7 @@ const {
   sendOwnerNewOrderEmail,
   sendCustomerOrderConfirmationEmail,
 } = require("../services/emailService");
-const { getActiveBundleOffers } = require("../services/bundleOfferService");
+const { getActiveCheckoutOffers } = require("../services/bundleOfferService");
 
 const createOrder = async (req, res) => {
   try {
@@ -66,14 +66,14 @@ const settings = await SiteSettings.findOne();
 const deliveryFee = settings?.deliveryFee ?? 80;
 const freeShippingThreshold = settings?.freeShippingThreshold ?? null;
 
-const activeBundleOffers = await getActiveBundleOffers();
+const activeCheckoutOffers = await getActiveCheckoutOffers();
 
 const baseTotals = calculateTotals(
   orderItems,
   deliveryFee,
   freeShippingThreshold,
   0,
-  activeBundleOffers
+  activeCheckoutOffers
 );
 
 let couponDiscount = 0;
@@ -107,7 +107,7 @@ const totals = calculateTotals(
   deliveryFee,
   freeShippingThreshold,
   couponDiscount,
-  activeBundleOffers
+  activeCheckoutOffers
 );
     const orderNumber = await generateOrderNumber();
 
@@ -137,6 +137,7 @@ bundleDiscount: totals.bundleDiscount,
 couponDiscount: totals.couponDiscount,
 total: totals.total,
 appliedOffer: totals.appliedOffer,
+freeDeliveryOffer: totals.freeDeliveryOffer || "",
 coupon: appliedCoupon,
 paymentMethod,
       instapayTiming: requiresPaymentTiming ? instapayTiming : "",

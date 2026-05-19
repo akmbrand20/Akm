@@ -217,6 +217,9 @@ const createAdminOffer = async (req, res) => {
     discountType,
     discountValue,
     badge,
+    showOnHome,
+    showOnCart,
+    freeDelivery,
     startsAt,
     endsAt,
     isActive,
@@ -301,6 +304,9 @@ const createAdminOffer = async (req, res) => {
     discountValue: finalType === "product" ? Number(discountValue) : 0,
 
     badge: cleanText(badge || ""),
+    showOnHome: showOnHome !== undefined ? Boolean(showOnHome) : true,
+    showOnCart: showOnCart !== undefined ? Boolean(showOnCart) : true,
+    freeDelivery: Boolean(freeDelivery),
     startsAt: startsAt || null,
     endsAt: endsAt || null,
     isActive: isActive !== undefined ? isActive : true,
@@ -356,6 +362,9 @@ const updateAdminOffer = async (req, res) => {
     discountType,
     discountValue,
     badge,
+    showOnHome,
+    showOnCart,
+    freeDelivery,
     startsAt,
     endsAt,
     isActive,
@@ -472,6 +481,9 @@ const updateAdminOffer = async (req, res) => {
   }
 
   if (badge !== undefined) offer.badge = cleanText(badge);
+  if (showOnHome !== undefined) offer.showOnHome = Boolean(showOnHome);
+  if (showOnCart !== undefined) offer.showOnCart = Boolean(showOnCart);
+  if (freeDelivery !== undefined) offer.freeDelivery = Boolean(freeDelivery);
   if (startsAt !== undefined) offer.startsAt = startsAt || null;
   if (endsAt !== undefined) offer.endsAt = endsAt || null;
   if (isActive !== undefined) offer.isActive = isActive;

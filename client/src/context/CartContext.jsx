@@ -78,6 +78,8 @@ const hydrateBundleOffers = (offers = [], products = []) => {
   const defaultBundleProducts = getDefaultBundleProducts(products);
 
   return offers.map((offer) => {
+    if (offer.type !== "bundle") return offer;
+
     const bundleProducts = Array.isArray(offer.bundleProducts)
       ? offer.bundleProducts
           .map((product) => {
@@ -163,7 +165,7 @@ const buildProductCartItem = ({ product, color, size, quantity }) => {
 
 export function CartProvider({ children }) {
   const { deliveryFee, freeShippingThreshold } = useSettings();
-  const [bundleOffers, setBundleOffers] = useState([]);
+  const [offers, setOffers] = useState([]);
 
   const [cartItems, setCartItems] = useState(getStoredCart);
   const [coupon, setCoupon] = useState(getStoredCoupon);
@@ -176,25 +178,24 @@ export function CartProvider({ children }) {
   const loadBundleOffers = async () => {
     try {
       const offers = await getOffers();
-      const nextBundleOffers = offers.filter((offer) => offer.type === "bundle");
-      const needsProducts = nextBundleOffers.some(
-        (offer) => !hasUsableBundleProducts(offer)
+      const needsProducts = offers.some(
+        (offer) => offer.type === "bundle" && !hasUsableBundleProducts(offer)
       );
 
       if (needsProducts) {
         try {
           const products = await getProducts();
-          setBundleOffers(hydrateBundleOffers(nextBundleOffers, products));
+          setOffers(hydrateBundleOffers(offers, products));
           return;
         } catch {
-          setBundleOffers(nextBundleOffers);
+          setOffers(offers);
           return;
         }
       }
 
-      setBundleOffers(nextBundleOffers);
+      setOffers(offers);
     } catch {
-      setBundleOffers([]);
+      setOffers([]);
     }
   };
 
@@ -428,6 +429,12 @@ export function CartProvider({ children }) {
     return cartItems.reduce((total, item) => total + Number(item.quantity || 0), 0);
   }, [cartItems]);
 
+  const bundleOffers = useMemo(() => {
+    return offers.filter(
+      (offer) => offer.type === "bundle" && offer.showOnCart !== false
+    );
+  }, [offers]);
+
   const totals = useMemo(() => {
   return calculateCartTotals(
     cartItems,
@@ -435,9 +442,9 @@ export function CartProvider({ children }) {
     freeShippingThreshold,
     coupon?.discount || 0,
     coupon?.code || "",
-    bundleOffers
+    offers
   );
-}, [cartItems, deliveryFee, freeShippingThreshold, coupon, bundleOffers]);
+}, [cartItems, deliveryFee, freeShippingThreshold, coupon, offers]);
 
   const value = {
     cartItems,

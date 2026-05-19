@@ -84,6 +84,21 @@ bundleProducts: [
       trim: true,
     },
 
+    showOnHome: {
+      type: Boolean,
+      default: true,
+    },
+
+    showOnCart: {
+      type: Boolean,
+      default: true,
+    },
+
+    freeDelivery: {
+      type: Boolean,
+      default: false,
+    },
+
     startsAt: {
       type: Date,
       default: null,

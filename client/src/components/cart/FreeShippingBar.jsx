@@ -5,6 +5,21 @@ export default function FreeShippingBar({ totals }) {
   const { t } = useLanguage();
   const threshold = totals.freeShippingThreshold;
 
+  if (totals.freeDeliveryByOffer) {
+    return (
+      <div className="rounded-3xl border border-emerald-400/20 bg-emerald-500/10 p-5">
+        <p className="text-sm uppercase tracking-[0.25em] text-emerald-200">
+          {t("shipping.unlocked")}
+        </p>
+        <h2 className="mt-2 text-xl font-semibold">
+          {t("shipping.offerUnlocked", {
+            offer: totals.freeDeliveryOffer || t("common.offer"),
+          })}
+        </h2>
+      </div>
+    );
+  }
+
   if (!threshold || Number(threshold) <= 0) return null;
 
   const afterDiscount = totals.subtotal - totals.discount;

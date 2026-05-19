@@ -21,7 +21,9 @@ export default function Home() {
     queryFn: getOffers,
   });
 
-  const bundleOffers = offers.filter((offer) => offer.type === "bundle");
+  const bundleOffers = offers.filter(
+    (offer) => offer.type === "bundle" && offer.showOnHome !== false
+  );
 
   return (
     <main className="min-h-screen bg-[#050505] text-[#f7f2ea]">
@@ -89,11 +91,19 @@ export default function Home() {
                 key={offer._id}
                 className="rounded-3xl border border-white/10 bg-white/[0.03] p-6"
               >
-                {offer.badge ? (
-                  <span className="inline-flex rounded-full bg-[#c8b89d] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-black">
-                    {offer.badge}
-                  </span>
-                ) : null}
+                <div className="flex flex-wrap gap-2">
+                  {offer.badge ? (
+                    <span className="inline-flex rounded-full bg-[#c8b89d] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-black">
+                      {offer.badge}
+                    </span>
+                  ) : null}
+
+                  {offer.freeDelivery ? (
+                    <span className="inline-flex rounded-full border border-emerald-300/30 bg-emerald-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100">
+                      {t("bundle.freeDelivery")}
+                    </span>
+                  ) : null}
+                </div>
 
                 <h3 className="mt-5 text-2xl font-semibold">{offer.title}</h3>
                 <p className="mt-3 text-zinc-300">{offer.description}</p>

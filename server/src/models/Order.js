@@ -156,6 +156,11 @@ couponDiscount: {
       default: null,
     },
 
+    freeDeliveryOffer: {
+      type: String,
+      default: "",
+    },
+
     coupon: {
   code: {
     type: String,

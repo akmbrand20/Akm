@@ -29,6 +29,9 @@ const defaultForm = {
   discountType: "percentage",
   discountValue: "",
   badge: "",
+  showOnHome: true,
+  showOnCart: true,
+  freeDelivery: false,
   targetProducts: [],
   bundleProducts: [],
   sets: "",
@@ -290,6 +293,9 @@ export default function AdminOffers() {
       discountType: offer.discountType || "percentage",
       discountValue: offer.discountValue || "",
       badge: offer.badge || "",
+      showOnHome: offer.showOnHome !== false,
+      showOnCart: offer.showOnCart !== false,
+      freeDelivery: Boolean(offer.freeDelivery),
       targetProducts:
         offer.targetProducts?.map((product) =>
           typeof product === "string" ? product : product._id
@@ -452,6 +458,40 @@ export default function AdminOffers() {
                 className="mt-2 w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-[#c8b89d]/60"
               />
             </div>
+
+            {form.type === "bundle" && (
+              <div className="grid gap-3 md:grid-cols-2">
+                <label className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/25 p-4 text-sm text-zinc-300">
+                  <span>Show on home page</span>
+                  <input
+                    name="showOnHome"
+                    type="checkbox"
+                    checked={form.showOnHome}
+                    onChange={handleChange}
+                  />
+                </label>
+
+                <label className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/25 p-4 text-sm text-zinc-300">
+                  <span>Show in cart page</span>
+                  <input
+                    name="showOnCart"
+                    type="checkbox"
+                    checked={form.showOnCart}
+                    onChange={handleChange}
+                  />
+                </label>
+              </div>
+            )}
+
+            <label className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/25 p-4 text-sm text-zinc-300">
+              <span>Free delivery when this offer applies</span>
+              <input
+                name="freeDelivery"
+                type="checkbox"
+                checked={form.freeDelivery}
+                onChange={handleChange}
+              />
+            </label>
 
             {form.type === "product" ? (
               <>
@@ -757,13 +797,15 @@ export default function AdminOffers() {
               <p className="p-6 text-zinc-400">No offers created yet.</p>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[1050px] text-left text-sm">
+                <table className="w-full min-w-[1250px] text-left text-sm">
                   <thead className="border-b border-white/10 bg-white/[0.04] text-zinc-400">
                     <tr>
                       <th className="px-5 py-4 font-medium">Offer</th>
                       <th className="px-5 py-4 font-medium">Type</th>
                       <th className="px-5 py-4 font-medium">Value</th>
                       <th className="px-5 py-4 font-medium">Products/Sets</th>
+                      <th className="px-5 py-4 font-medium">Placement</th>
+                      <th className="px-5 py-4 font-medium">Delivery</th>
                       <th className="px-5 py-4 font-medium">Email</th>
                       <th className="px-5 py-4 font-medium">Status</th>
                       <th className="px-5 py-4 font-medium">Actions</th>
@@ -819,6 +861,41 @@ export default function AdminOffers() {
                                 ? ""
                                 : "s"
                             }`
+                          )}
+                        </td>
+
+                        <td className="px-5 py-4">
+                          {offer.type === "bundle" ? (
+                            <div className="flex flex-wrap gap-2">
+                              {offer.showOnHome !== false && (
+                                <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-300">
+                                  Home
+                                </span>
+                              )}
+                              {offer.showOnCart !== false && (
+                                <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-300">
+                                  Cart
+                                </span>
+                              )}
+                              {offer.showOnHome === false &&
+                                offer.showOnCart === false && (
+                                  <span className="text-xs text-zinc-500">
+                                    Hidden
+                                  </span>
+                                )}
+                            </div>
+                          ) : (
+                            <span className="text-xs text-zinc-500">-</span>
+                          )}
+                        </td>
+
+                        <td className="px-5 py-4">
+                          {offer.freeDelivery ? (
+                            <span className="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200">
+                              Free delivery
+                            </span>
+                          ) : (
+                            <span className="text-xs text-zinc-500">-</span>
                           )}
                         </td>
 
