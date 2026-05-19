@@ -38,7 +38,17 @@ const seedDatabase = async () => {
     }
 
     console.log("Creating offers...");
-    await Offer.insertMany(offers);
+    const bundleProducts = tshirt && pants ? [tshirt._id, pants._id] : [];
+    const offersWithBundleProducts = offers.map((offer) =>
+      offer.type === "bundle" && bundleProducts.length === 2
+        ? {
+            ...offer,
+            bundleProducts,
+          }
+        : offer
+    );
+
+    await Offer.insertMany(offersWithBundleProducts);
 
     console.log("Creating site settings...");
     await SiteSettings.create(settings);

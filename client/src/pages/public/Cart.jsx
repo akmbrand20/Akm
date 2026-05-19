@@ -21,6 +21,8 @@ export default function Cart() {
   clearCart,
   applyCoupon,
   removeCoupon,
+  bundleOffers,
+  completeBundleOffer,
 } = useCart();
 
   if (cartItems.length === 0) {
@@ -90,7 +92,12 @@ export default function Cart() {
         <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_380px]">
           <div className="space-y-4">
   <FreeShippingBar totals={totals} />
-  <BundleDiscountNotice totals={totals} />
+  <BundleDiscountNotice
+    totals={totals}
+    cartItems={cartItems}
+    bundleOffers={bundleOffers}
+    onCompleteBundle={completeBundleOffer}
+  />
   <CouponBox
   totals={totals}
   coupon={coupon}

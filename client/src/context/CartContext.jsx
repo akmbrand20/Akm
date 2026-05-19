@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { calculateCartTotals } from "../lib/cartCalculations";
 import { useSettings } from "./SettingsContext";
 import { getOffers } from "../services/offerService";
+import { getProducts } from "../services/productService";
 
 const CartContext = createContext(null);
 
@@ -12,7 +13,7 @@ const getStoredCart = () => {
   try {
     const storedCart = localStorage.getItem(CART_STORAGE_KEY);
     return storedCart ? JSON.parse(storedCart) : [];
-  } catch (error) {
+  } catch {
     return [];
   }
 };
@@ -21,7 +22,7 @@ const getStoredCoupon = () => {
   try {
     const storedCoupon = localStorage.getItem(COUPON_STORAGE_KEY);
     return storedCoupon ? JSON.parse(storedCoupon) : null;
-  } catch (error) {
+  } catch {
     return null;
   }
 };
@@ -43,6 +44,123 @@ const buildCartItemId = (item) => {
   );
 };
 
+const normalizeProductId = (value) => {
+  if (!value) return "";
+  return String(value._id || value.id || value);
+};
+
+const hasUsableBundleProducts = (offer) => {
+  return (
+    Array.isArray(offer?.bundleProducts) &&
+    offer.bundleProducts.filter(
+      (product) => product && typeof product === "object" && product.colors
+    ).length >= 2
+  );
+};
+
+const getDefaultBundleProducts = (products = []) => {
+  const activeProducts = products.filter((product) => product?.isActive !== false);
+  const tshirt = activeProducts.find((product) =>
+    String(product.category || "").includes("tshirt")
+  );
+  const pants = activeProducts.find((product) =>
+    String(product.category || "").includes("pants")
+  );
+
+  if (tshirt && pants && normalizeProductId(tshirt) !== normalizeProductId(pants)) {
+    return [tshirt, pants];
+  }
+
+  return activeProducts.slice(0, 2);
+};
+
+const hydrateBundleOffers = (offers = [], products = []) => {
+  const defaultBundleProducts = getDefaultBundleProducts(products);
+
+  return offers.map((offer) => {
+    const bundleProducts = Array.isArray(offer.bundleProducts)
+      ? offer.bundleProducts
+          .map((product) => {
+            if (product && typeof product === "object" && product.colors) {
+              return product;
+            }
+
+            return products.find(
+              (candidate) =>
+                normalizeProductId(candidate) === normalizeProductId(product)
+            );
+          })
+          .filter(Boolean)
+      : [];
+
+    if (bundleProducts.length >= 2) {
+      return {
+        ...offer,
+        bundleProducts,
+      };
+    }
+
+    if (defaultBundleProducts.length >= 2) {
+      return {
+        ...offer,
+        bundleProducts: defaultBundleProducts,
+      };
+    }
+
+    return offer;
+  });
+};
+
+const getProductVariantStock = (product, color, size) => {
+  const colorData = product?.colors?.find(
+    (productColor) => productColor.name === color
+  );
+  const sizeData = colorData?.sizes?.find((sizeItem) => sizeItem.size === size);
+
+  return Number(sizeData?.stock || 0);
+};
+
+const getProductVariantImage = (product, color) => {
+  const colorData = product?.colors?.find(
+    (productColor) => productColor.name === color
+  );
+
+  return colorData?.images?.[0]?.url || "/images/akm-logo.webp";
+};
+
+const getProductCartPrice = (product) => {
+  if (
+    product?.activeOffer &&
+    Number(product.salePrice) < Number(product.price)
+  ) {
+    return Number(product.salePrice || 0);
+  }
+
+  return Number(product?.price || 0);
+};
+
+const buildProductCartItem = ({ product, color, size, quantity }) => {
+  const productId = normalizeProductId(product);
+  const maxStock = getProductVariantStock(product, color, size);
+
+  return {
+    cartItemId: `${productId}-${color}-${size}`,
+    productId,
+    slug: product.slug,
+    name: product.name,
+    category: product.category,
+    color,
+    size,
+    quantity,
+    price: getProductCartPrice(product),
+    originalPrice: product.price,
+    offerBadge: product.activeOffer?.badge || "",
+    offerTitle: product.activeOffer?.title || "",
+    image: getProductVariantImage(product, color),
+    maxStock,
+  };
+};
+
 export function CartProvider({ children }) {
   const { deliveryFee, freeShippingThreshold } = useSettings();
   const [bundleOffers, setBundleOffers] = useState([]);
@@ -58,8 +176,24 @@ export function CartProvider({ children }) {
   const loadBundleOffers = async () => {
     try {
       const offers = await getOffers();
-      setBundleOffers(offers.filter((offer) => offer.type === "bundle"));
-    } catch (error) {
+      const nextBundleOffers = offers.filter((offer) => offer.type === "bundle");
+      const needsProducts = nextBundleOffers.some(
+        (offer) => !hasUsableBundleProducts(offer)
+      );
+
+      if (needsProducts) {
+        try {
+          const products = await getProducts();
+          setBundleOffers(hydrateBundleOffers(nextBundleOffers, products));
+          return;
+        } catch {
+          setBundleOffers(nextBundleOffers);
+          return;
+        }
+      }
+
+      setBundleOffers(nextBundleOffers);
+    } catch {
       setBundleOffers([]);
     }
   };
@@ -184,6 +318,101 @@ export function CartProvider({ children }) {
     setCoupon(null);
   };
 
+  const completeBundleOffer = ({ offer, baseCartItemId }) => {
+    if (!offer || !baseCartItemId) return;
+
+    const targetQuantity = Number(offer.sets || 0);
+    const bundleProducts = Array.isArray(offer.bundleProducts)
+      ? offer.bundleProducts
+      : [];
+
+    if (targetQuantity <= 0 || bundleProducts.length < 2) return;
+
+    setCartItems((currentItems) => {
+      const baseItem = currentItems.find(
+        (item) => item.cartItemId === baseCartItemId
+      );
+
+      if (!baseItem) return currentItems;
+
+      const baseProductId = normalizeProductId(baseItem.productId);
+      const baseIsInBundle = bundleProducts.some(
+        (product) => normalizeProductId(product) === baseProductId
+      );
+
+      if (!baseIsInBundle) return currentItems;
+
+      const partnerProduct = bundleProducts.find(
+        (product) => normalizeProductId(product) !== baseProductId
+      );
+
+      if (!partnerProduct) return currentItems;
+
+      const partnerProductId = normalizeProductId(partnerProduct);
+      const partnerMaxStock = getProductVariantStock(
+        partnerProduct,
+        baseItem.color,
+        baseItem.size
+      );
+
+      if (partnerMaxStock <= 0) return currentItems;
+
+      let partnerExists = false;
+
+      const updatedItems = currentItems.map((item) => {
+        if (item.cartItemId === baseItem.cartItemId) {
+          const maxStock = getSafeMaxStock(item);
+
+          return {
+            ...item,
+            quantity: Math.min(
+              Math.max(Number(item.quantity || 1), targetQuantity),
+              maxStock
+            ),
+          };
+        }
+
+        const isPartnerVariant =
+          normalizeProductId(item.productId) === partnerProductId &&
+          item.color === baseItem.color &&
+          item.size === baseItem.size;
+
+        if (!isPartnerVariant) return item;
+
+        partnerExists = true;
+
+        return {
+          ...item,
+          ...buildProductCartItem({
+            product: partnerProduct,
+            color: baseItem.color,
+            size: baseItem.size,
+            quantity: Math.min(
+              Math.max(Number(item.quantity || 1), targetQuantity),
+              partnerMaxStock
+            ),
+          }),
+          quantity: Math.min(
+            Math.max(Number(item.quantity || 1), targetQuantity),
+            partnerMaxStock
+          ),
+        };
+      });
+
+      if (partnerExists) return updatedItems;
+
+      return [
+        ...updatedItems,
+        buildProductCartItem({
+          product: partnerProduct,
+          color: baseItem.color,
+          size: baseItem.size,
+          quantity: Math.min(targetQuantity, partnerMaxStock),
+        }),
+      ];
+    });
+  };
+
   const getCartItemQuantity = ({ productId, color, size }) => {
     const item = cartItems.find(
       (cartItem) =>
@@ -223,6 +452,8 @@ export function CartProvider({ children }) {
     applyCoupon,
     removeCoupon,
     getCartItemQuantity,
+    bundleOffers,
+    completeBundleOffer,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

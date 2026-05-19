@@ -124,6 +124,21 @@ export const translations = {
         "Add a T-Shirt and Pants together to unlock bundle pricing.",
       pricing:
         "Duo Bundle: 2 complete sets for 2,000 EGP. Signature Bundle: 3 complete sets for 2,800 EGP.",
+      setsForPrice: "{count} each - {price}",
+      chooseItemFor: "Choose the item for {offer}.",
+      willSetQuantities: "Cart will hold {count} of each matching item.",
+      matchingItem: "Matches with {product} in {color} / {size}.",
+      currentQuantity: "In cart: {count}",
+      completeOffer: "Complete {offer}",
+      applied: "{offer} added to your cart.",
+      chooseFirst: "Choose a cart item first.",
+      missingPartner: "Matching bundle product is not available.",
+      missingVariant: "{color} / {size} is not available in the matching product.",
+      notEnoughStock: "Only {count} available for this set.",
+      noConfiguredOffers:
+        "Bundle buttons will appear when two bundle products are configured.",
+      noCartCandidates:
+        "Add one of the bundle products to your cart first.",
     },
     shipping: {
       unlocked: "Free Delivery Unlocked",
