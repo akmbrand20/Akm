@@ -21,6 +21,14 @@ const getVariantStock = (product, color, size) => {
   return Number(sizeData?.stock || 0);
 };
 
+const getVariantImage = (product, color) => {
+  const colorData = product?.colors?.find(
+    (productColor) => productColor.name === color
+  );
+
+  return colorData?.images?.[0]?.url || "";
+};
+
 const getPartnerProduct = (offer, cartItem) => {
   const bundleProducts = Array.isArray(offer?.bundleProducts)
     ? offer.bundleProducts
@@ -40,6 +48,7 @@ const getCandidateDetails = ({ cartItem, offer, cartItems, t }) => {
     return {
       disabledReason: t("bundle.missingPartner"),
       partnerProduct: null,
+      partnerCartQuantity: 0,
       helperText: "",
     };
   }
@@ -53,6 +62,7 @@ const getCandidateDetails = ({ cartItem, offer, cartItems, t }) => {
       item.color === cartItem.color &&
       item.size === cartItem.size
   );
+  const partnerCartQuantity = Number(existingPartner?.quantity || 0);
   const partnerVariantStock =
     getVariantStock(partnerProduct, cartItem.color, cartItem.size) ||
     Number(existingPartner?.maxStock || 0);
@@ -64,6 +74,7 @@ const getCandidateDetails = ({ cartItem, offer, cartItems, t }) => {
     return {
       disabledReason: t("bundle.notEnoughStock", { count: baseMaxStock }),
       partnerProduct,
+      partnerCartQuantity,
       helperText: "",
     };
   }
@@ -75,6 +86,7 @@ const getCandidateDetails = ({ cartItem, offer, cartItems, t }) => {
         size: cartItem.size,
       }),
       partnerProduct,
+      partnerCartQuantity,
       helperText: "",
     };
   }
@@ -83,6 +95,7 @@ const getCandidateDetails = ({ cartItem, offer, cartItems, t }) => {
     return {
       disabledReason: t("bundle.notEnoughStock", { count: partnerAvailable }),
       partnerProduct,
+      partnerCartQuantity,
       helperText: "",
     };
   }
@@ -90,8 +103,9 @@ const getCandidateDetails = ({ cartItem, offer, cartItems, t }) => {
   return {
     disabledReason: "",
     partnerProduct,
+    partnerCartQuantity,
     helperText: t("bundle.matchingItem", {
-      product: partnerProduct.name,
+      product: cartItem.name,
       color: cartItem.color,
       size: cartItem.size,
     }),
@@ -277,8 +291,19 @@ export default function BundleDiscountNotice({
 
           {candidateItems.length > 0 ? (
             <div className="mt-4 grid gap-3">
-              {candidateItems.map(({ item, disabledReason, helperText }) => {
+              {candidateItems.map(({
+                item,
+                partnerProduct,
+                partnerCartQuantity,
+                disabledReason,
+                helperText,
+              }) => {
                 const selected = item.cartItemId === selectedCartItemId;
+                const displayName = partnerProduct?.name || item.name;
+                const displayImage =
+                  getVariantImage(partnerProduct, item.color) ||
+                  item.image ||
+                  "/images/akm-logo.webp";
 
                 return (
                   <button
@@ -304,8 +329,8 @@ export default function BundleDiscountNotice({
                     <span className="block overflow-hidden rounded-xl bg-white/[0.04]">
                       <span className="block aspect-square">
                         <img
-                          src={item.image || "/images/akm-logo.webp"}
-                          alt={item.name}
+                          src={displayImage}
+                          alt={displayName}
                           className="h-full w-full object-cover"
                           loading="lazy"
                         />
@@ -314,12 +339,12 @@ export default function BundleDiscountNotice({
 
                     <span>
                       <span className="block font-semibold text-white">
-                        {item.name}
+                        {displayName}
                       </span>
                       <span className="mt-1 block text-sm text-zinc-400">
                         {item.color} / {item.size} -{" "}
                         {t("bundle.currentQuantity", {
-                          count: Number(item.quantity || 0),
+                          count: Number(partnerCartQuantity || 0),
                         })}
                       </span>
                       <span className="mt-1 block text-xs text-zinc-500">
