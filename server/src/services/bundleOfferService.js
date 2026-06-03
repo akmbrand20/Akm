@@ -1,55 +1,4 @@
 const Offer = require("../models/Offer");
-const Product = require("../models/Product");
-
-const normalizeProductId = (value) => {
-  if (!value) return "";
-  return String(value._id || value);
-};
-
-const getDefaultBundleProducts = async () => {
-  const products = await Product.find({ isActive: true }).sort({ createdAt: -1 });
-  const tshirt = products.find((product) =>
-    String(product.category || "").includes("tshirt")
-  );
-  const pants = products.find((product) =>
-    String(product.category || "").includes("pants")
-  );
-
-  if (tshirt && pants && normalizeProductId(tshirt) !== normalizeProductId(pants)) {
-    return [tshirt, pants];
-  }
-
-  return products.slice(0, 2);
-};
-
-const hydrateLegacyBundleOffers = async (offers = []) => {
-  const needsFallback = offers.some(
-    (offer) =>
-      offer.type === "bundle" &&
-      (!Array.isArray(offer.bundleProducts) || offer.bundleProducts.length < 2)
-  );
-
-  if (!needsFallback) return offers;
-
-  const defaultBundleProducts = await getDefaultBundleProducts();
-
-  if (defaultBundleProducts.length < 2) return offers;
-
-  return offers.map((offer) => {
-    if (offer.type !== "bundle") return offer;
-
-    if (Array.isArray(offer.bundleProducts) && offer.bundleProducts.length >= 2) {
-      return offer;
-    }
-
-    const plainOffer = offer.toObject ? offer.toObject() : offer;
-
-    return {
-      ...plainOffer,
-      bundleProducts: defaultBundleProducts,
-    };
-  });
-};
 
 const getActiveOfferQuery = (typeFilter) => {
   const now = new Date();
@@ -69,21 +18,17 @@ const getActiveOfferQuery = (typeFilter) => {
 };
 
 const getActiveBundleOffers = async () => {
-  const offers = await Offer.find(getActiveOfferQuery("bundle")).sort({
+  return Offer.find(getActiveOfferQuery("bundle")).sort({
     sets: -1,
     savings: -1,
     sortOrder: 1,
   });
-
-  return hydrateLegacyBundleOffers(offers);
 };
 
 const getActiveCheckoutOffers = async () => {
-  const offers = await Offer.find(
+  return Offer.find(
     getActiveOfferQuery({ $in: ["bundle", "product"] })
   ).sort({ sets: -1, savings: -1, sortOrder: 1, createdAt: -1 });
-
-  return hydrateLegacyBundleOffers(offers);
 };
 
 module.exports = {

@@ -9,10 +9,16 @@ const normalizeProductId = (value) => {
   return String(value._id || value);
 };
 
+const normalizeOfferId = (value) => {
+  if (!value) return "";
+  return String(value._id || value.id || value);
+};
+
 const normalizeBundleOffers = (bundleOffers = []) => {
   return bundleOffers
     .filter((offer) => offer && offer.type === "bundle" && offer.isActive)
     .map((offer) => ({
+      id: normalizeOfferId(offer),
       title: offer.title || "Bundle Offer",
       sets: Number(offer.sets || 0),
       regularPrice: Number(offer.regularPrice || 0),
@@ -67,7 +73,45 @@ const getOfferProductIds = (products = []) => {
     : [];
 };
 
-const getFreeDeliveryOffer = (items = [], offers = []) => {
+const isBundleOfferEligible = (items = [], offer) => {
+  const bundleProducts = getOfferProductIds(offer?.bundleProducts);
+  const sets = Number(offer?.sets || 0);
+
+  return (
+    sets > 0 &&
+    bundleProducts.length >= 2 &&
+    getCompleteSetsForBundle(items, bundleProducts) >= sets
+  );
+};
+
+const getProductFreeDeliveryOffer = (items = [], offers = []) => {
+  for (const offer of offers) {
+    if (offer.type !== "product") continue;
+
+    const targetProducts = getOfferProductIds(offer.targetProducts);
+    const hasTargetProduct = items.some((item) =>
+      targetProducts.includes(normalizeProductId(item.productId))
+    );
+
+    if (hasTargetProduct) {
+      return {
+        unlocked: true,
+        offerTitle: offer.title || "",
+      };
+    }
+  }
+
+  return {
+    unlocked: false,
+    offerTitle: "",
+  };
+};
+
+const getFreeDeliveryOffer = (
+  items = [],
+  offers = [],
+  activeBundleOfferId = ""
+) => {
   if (!items.length) {
     return {
       unlocked: false,
@@ -75,6 +119,7 @@ const getFreeDeliveryOffer = (items = [], offers = []) => {
     };
   }
 
+  const activeOfferId = normalizeOfferId(activeBundleOfferId);
   const activeFreeDeliveryOffers = offers.filter(
     (offer) =>
       offer &&
@@ -83,16 +128,27 @@ const getFreeDeliveryOffer = (items = [], offers = []) => {
       ["bundle", "product"].includes(offer.type)
   );
 
+  if (activeOfferId) {
+    const selectedBundleOffer = offers.find(
+      (offer) =>
+        offer?.type === "bundle" && normalizeOfferId(offer) === activeOfferId
+    );
+
+    if (selectedBundleOffer && isBundleOfferEligible(items, selectedBundleOffer)) {
+      if (selectedBundleOffer.freeDelivery) {
+        return {
+          unlocked: true,
+          offerTitle: selectedBundleOffer.title || "",
+        };
+      }
+
+      return getProductFreeDeliveryOffer(items, activeFreeDeliveryOffers);
+    }
+  }
+
   for (const offer of activeFreeDeliveryOffers) {
     if (offer.type === "bundle") {
-      const bundleProducts = getOfferProductIds(offer.bundleProducts);
-      const sets = Number(offer.sets || 0);
-
-      if (
-        sets > 0 &&
-        bundleProducts.length >= 2 &&
-        getCompleteSetsForBundle(items, bundleProducts) >= sets
-      ) {
+      if (isBundleOfferEligible(items, offer)) {
         return {
           unlocked: true,
           offerTitle: offer.title || "",
@@ -101,16 +157,13 @@ const getFreeDeliveryOffer = (items = [], offers = []) => {
     }
 
     if (offer.type === "product") {
-      const targetProducts = getOfferProductIds(offer.targetProducts);
-      const hasTargetProduct = items.some((item) =>
-        targetProducts.includes(normalizeProductId(item.productId))
+      const productFreeDeliveryOffer = getProductFreeDeliveryOffer(
+        items,
+        activeFreeDeliveryOffers
       );
 
-      if (hasTargetProduct) {
-        return {
-          unlocked: true,
-          offerTitle: offer.title || "",
-        };
+      if (productFreeDeliveryOffer.unlocked) {
+        return productFreeDeliveryOffer;
       }
     }
   }
@@ -121,37 +174,65 @@ const getFreeDeliveryOffer = (items = [], offers = []) => {
   };
 };
 
-export const calculateBundleDiscount = (items = [], bundleOffers = []) => {
+const buildBundleDiscountResult = (offer, completeSets) => {
+  const timesApplied = Math.floor(completeSets / offer.sets);
+  const discount = offer.savings * timesApplied;
+
+  return {
+    appliedOfferId: offer.id,
+    appliedOffer: offer.title,
+    completeSets,
+    discount,
+    offerSets: offer.sets,
+    message: `${offer.title} applied: ${timesApplied} bundle${
+      timesApplied > 1 ? "s" : ""
+    }.`,
+  };
+};
+
+const chooseBetterBundleResult = (currentBest, candidate) => {
+  if (candidate.discount > currentBest.discount) return candidate;
+  if (candidate.discount < currentBest.discount) return currentBest;
+  if (candidate.offerSets > Number(currentBest.offerSets || 0)) return candidate;
+  return currentBest;
+};
+
+export const calculateBundleDiscount = (
+  items = [],
+  bundleOffers = [],
+  activeBundleOfferId = ""
+) => {
   const activeBundleOffers = normalizeBundleOffers(bundleOffers);
+  const selectedOfferId = normalizeOfferId(activeBundleOfferId);
 
   let bestResult = {
+    appliedOfferId: "",
     appliedOffer: null,
     completeSets: 0,
     discount: 0,
+    offerSets: 0,
     message: "",
   };
+  const eligibleResults = [];
 
   activeBundleOffers.forEach((offer) => {
     const completeSets = getCompleteSetsForBundle(items, offer.bundleProducts);
 
     if (completeSets < offer.sets) return;
 
-    const timesApplied = Math.floor(completeSets / offer.sets);
-    const discount = offer.savings * timesApplied;
+    const result = buildBundleDiscountResult(offer, completeSets);
+    eligibleResults.push(result);
 
-    if (discount > bestResult.discount) {
-      bestResult = {
-        appliedOffer: offer.title,
-        completeSets,
-        discount,
-        message: `${offer.title} applied: ${timesApplied} bundle${
-          timesApplied > 1 ? "s" : ""
-        }.`,
-      };
+    if (selectedOfferId && result.appliedOfferId === selectedOfferId) {
+      bestResult = result;
     }
   });
 
-  return bestResult;
+  if (selectedOfferId && bestResult.appliedOfferId === selectedOfferId) {
+    return bestResult;
+  }
+
+  return eligibleResults.reduce(chooseBetterBundleResult, bestResult);
 };
 
 export const calculateCartTotals = (
@@ -160,15 +241,24 @@ export const calculateCartTotals = (
   freeShippingThreshold = null,
   couponDiscount = 0,
   couponCode = "",
-  bundleOffers = []
+  bundleOffers = [],
+  activeBundleOfferId = ""
 ) => {
   const subtotal = calculateCartSubtotal(items);
-  const bundle = calculateBundleDiscount(items, bundleOffers);
+  const bundle = calculateBundleDiscount(
+    items,
+    bundleOffers,
+    activeBundleOfferId
+  );
 
   const afterBundle = Math.max(0, subtotal - bundle.discount);
   const safeCouponDiscount = Math.min(Number(couponDiscount || 0), afterBundle);
   const afterAllDiscounts = Math.max(0, afterBundle - safeCouponDiscount);
-  const freeDeliveryOffer = getFreeDeliveryOffer(items, bundleOffers);
+  const freeDeliveryOffer = getFreeDeliveryOffer(
+    items,
+    bundleOffers,
+    bundle.appliedOfferId
+  );
 
   const hasItems = items.length > 0;
   const thresholdFreeShippingUnlocked =
@@ -191,6 +281,7 @@ export const calculateCartTotals = (
     bundleDiscount: bundle.discount,
     couponDiscount: safeCouponDiscount,
     couponCode,
+    appliedOfferId: bundle.appliedOfferId,
     appliedOffer: bundle.appliedOffer,
     completeSets: bundle.completeSets,
     bundleMessage: bundle.message,

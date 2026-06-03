@@ -26,6 +26,7 @@ const createOrder = async (req, res) => {
   transactionReference,
   trackingEventId,
   couponCode,
+  activeBundleOfferId,
 } = req.body;
 
     if (!customer) {
@@ -73,7 +74,8 @@ const baseTotals = calculateTotals(
   deliveryFee,
   freeShippingThreshold,
   0,
-  activeCheckoutOffers
+  activeCheckoutOffers,
+  activeBundleOfferId
 );
 
 let couponDiscount = 0;
@@ -107,7 +109,8 @@ const totals = calculateTotals(
   deliveryFee,
   freeShippingThreshold,
   couponDiscount,
-  activeCheckoutOffers
+  activeCheckoutOffers,
+  activeBundleOfferId
 );
     const orderNumber = await generateOrderNumber();
 

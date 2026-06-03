@@ -270,10 +270,6 @@ export default function AdminOffers() {
         };
       }
 
-      if (prev.bundleProducts.length >= 2) {
-        return prev;
-      }
-
       return {
         ...prev,
         bundleProducts: [...prev.bundleProducts, productId],
@@ -595,11 +591,11 @@ export default function AdminOffers() {
                   <div className="mt-2 rounded-2xl border border-white/10 bg-black/25 p-4 text-sm text-zinc-400">
                     {selectedBundleProductNames.length > 0
                       ? selectedBundleProductNames.join(" + ")
-                      : "Choose exactly two products below."}
+                      : "Choose at least two products below."}
                   </div>
                   <p className="mt-2 text-xs text-zinc-500">
                     The bundle applies only when the cart contains these exact
-                    two products.
+                    selected products.
                   </p>
                 </div>
               </>
@@ -748,8 +744,8 @@ export default function AdminOffers() {
             <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
               <h2 className="text-2xl font-semibold">Choose Bundle Products</h2>
               <p className="mt-2 text-sm text-zinc-400">
-                Choose exactly two products. The bundle discount applies only
-                when both selected products are in the cart.
+                Choose two or more products. The bundle discount applies only
+                when the selected products are in the cart.
               </p>
 
               {productsLoading ? (
@@ -758,15 +754,12 @@ export default function AdminOffers() {
                 <div className="mt-5 grid gap-3 md:grid-cols-2">
                   {products.map((product) => {
                     const selected = form.bundleProducts.includes(product._id);
-                    const disabled =
-                      !selected && form.bundleProducts.length >= 2;
 
                     return (
                       <button
                         key={product._id}
                         type="button"
                         onClick={() => toggleBundleProduct(product._id)}
-                        disabled={disabled}
                         className={`rounded-2xl border p-4 text-left transition disabled:cursor-not-allowed disabled:opacity-40 ${
                           selected
                             ? "border-[#c8b89d] bg-[#c8b89d]/10"

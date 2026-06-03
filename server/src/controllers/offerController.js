@@ -165,21 +165,21 @@ const validateBundleOffer = async ({
   savings,
   bundleProducts,
 }) => {
-  if (!Array.isArray(bundleProducts) || bundleProducts.length !== 2) {
-    return "Choose exactly two products for this bundle.";
+  if (!Array.isArray(bundleProducts) || bundleProducts.length < 2) {
+    return "Choose at least two products for this bundle.";
   }
 
   const uniqueProductIds = [...new Set(bundleProducts.map(String))];
 
-  if (uniqueProductIds.length !== 2) {
-    return "Bundle products must be two different products.";
+  if (uniqueProductIds.length !== bundleProducts.length) {
+    return "Bundle products must be different products.";
   }
 
   const productCount = await Product.countDocuments({
     _id: { $in: uniqueProductIds },
   });
 
-  if (productCount !== 2) {
+  if (productCount !== uniqueProductIds.length) {
     return "One or more selected bundle products were not found.";
   }
 

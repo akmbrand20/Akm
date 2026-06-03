@@ -22,7 +22,7 @@ import {
 export default function Checkout() {
   const navigate = useNavigate();
 const { t } = useLanguage();
-const { cartItems, totals, coupon, clearCart } = useCart();
+const { cartItems, totals, coupon, activeBundleOfferId, clearCart } = useCart();
 const { customer: loggedInCustomer } = useCustomerAuth();
 
   const hasTrackedCheckout = useRef(false);
@@ -128,6 +128,7 @@ const { customer: loggedInCustomer } = useCustomerAuth();
           : "",
       trackingEventId,
       couponCode: coupon?.code || "",
+      activeBundleOfferId,
     });
   };
 
