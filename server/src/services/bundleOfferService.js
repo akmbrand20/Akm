@@ -17,18 +17,31 @@ const getActiveOfferQuery = (typeFilter) => {
   };
 };
 
+const populateCheckoutOfferProducts = (query) => {
+  return query
+    .populate("targetProducts", "_id")
+    .populate("bundleProducts", "price");
+};
+
 const getActiveBundleOffers = async () => {
-  return Offer.find(getActiveOfferQuery("bundle")).sort({
-    sets: -1,
-    savings: -1,
-    sortOrder: 1,
-  });
+  return populateCheckoutOfferProducts(
+    Offer.find(getActiveOfferQuery("bundle")).sort({
+      sets: -1,
+      savings: -1,
+      sortOrder: 1,
+    })
+  );
 };
 
 const getActiveCheckoutOffers = async () => {
-  return Offer.find(
-    getActiveOfferQuery({ $in: ["bundle", "product"] })
-  ).sort({ sets: -1, savings: -1, sortOrder: 1, createdAt: -1 });
+  return populateCheckoutOfferProducts(
+    Offer.find(getActiveOfferQuery({ $in: ["bundle", "product"] })).sort({
+      sets: -1,
+      savings: -1,
+      sortOrder: 1,
+      createdAt: -1,
+    })
+  );
 };
 
 module.exports = {

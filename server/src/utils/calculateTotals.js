@@ -14,6 +14,31 @@ const normalizeOfferId = (value) => {
   return String(value._id || value.id || value);
 };
 
+const getBundleRegularProductValue = (offer) => {
+  const sets = Number(offer?.sets || 0);
+  const bundleProductsValue = Array.isArray(offer?.bundleProducts)
+    ? offer.bundleProducts.reduce((total, product) => {
+        if (!product || typeof product !== "object") return total;
+        return total + Number(product.price || 0);
+      }, 0)
+    : 0;
+
+  if (sets > 0 && bundleProductsValue > 0) {
+    return bundleProductsValue * sets;
+  }
+
+  return Number(offer?.regularPrice || 0);
+};
+
+const getBundleProductSavings = (offer) => {
+  const regularProductValue = getBundleRegularProductValue(offer);
+  const offerPrice = Number(offer?.offerPrice || 0);
+
+  if (regularProductValue <= 0 || offerPrice <= 0) return 0;
+
+  return Math.max(0, regularProductValue - offerPrice);
+};
+
 const normalizeBundleOffers = (bundleOffers = []) => {
   return bundleOffers
     .filter((offer) => offer && offer.type === "bundle" && offer.isActive)
@@ -23,13 +48,7 @@ const normalizeBundleOffers = (bundleOffers = []) => {
       sets: Number(offer.sets || 0),
       regularPrice: Number(offer.regularPrice || 0),
       offerPrice: Number(offer.offerPrice || 0),
-      savings: Number(
-        offer.savings ||
-          Math.max(
-            0,
-            Number(offer.regularPrice || 0) - Number(offer.offerPrice || 0)
-          )
-      ),
+      savings: getBundleProductSavings(offer),
       badge: offer.badge || "",
       bundleProducts: Array.isArray(offer.bundleProducts)
         ? offer.bundleProducts.map(normalizeProductId).filter(Boolean)
