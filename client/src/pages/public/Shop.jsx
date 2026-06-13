@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ProductCard from "../../components/product/ProductCard";
 import ProductFilters from "../../components/product/ProductFilters";
@@ -12,15 +12,26 @@ export default function Shop() {
   const [category, setCategory] = useState("");
   const [color, setColor] = useState("");
   const [size, setSize] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [search]);
 
   const queryParams = useMemo(() => {
     return {
-      search: search || undefined,
+      search: debouncedSearch || undefined,
       category: category || undefined,
       color: color || undefined,
       size: size || undefined,
     };
-  }, [search, category, color, size]);
+  }, [debouncedSearch, category, color, size]);
 
   const { data: filterOptions = {} } = useQuery({
     queryKey: ["productFilters"],

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getFeaturedProducts } from "../../services/productService";
-import { getOffers } from "../../services/offerService";
+import { usePublicOffers } from "../../hooks/usePublicOffers";
 import { useSettings } from "../../context/SettingsContext";
 import ProductCard from "../../components/product/ProductCard";
 import SEO from "../../components/common/SEO";
@@ -16,10 +16,7 @@ export default function Home() {
     queryFn: getFeaturedProducts,
   });
 
-  const { data: offers = [], isLoading: offersLoading } = useQuery({
-    queryKey: ["offers"],
-    queryFn: getOffers,
-  });
+  const { data: offers = [], isLoading: offersLoading } = usePublicOffers();
 
   const bundleOffers = offers.filter(
     (offer) => offer.type === "bundle" && offer.showOnHome !== false

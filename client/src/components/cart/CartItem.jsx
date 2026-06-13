@@ -23,6 +23,7 @@ export default function CartItem({ item, onIncrease, onDecrease, onRemove }) {
               alt={item.name}
               className="h-full w-full object-cover"
               loading="lazy"
+              decoding="async"
             />
           ) : (
             <img
@@ -30,6 +31,7 @@ export default function CartItem({ item, onIncrease, onDecrease, onRemove }) {
               alt="AKM"
               className="h-full w-full object-cover opacity-60"
               loading="lazy"
+              decoding="async"
             />
           )}
         </div>

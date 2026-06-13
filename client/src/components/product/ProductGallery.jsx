@@ -105,6 +105,7 @@ export default function ProductGallery({ images = [], productName }) {
                   alt={image.alt || productName || "AKM product"}
                   className="h-full w-full object-cover"
                   loading="lazy"
+                  decoding="async"
                 />
               </button>
             ))}

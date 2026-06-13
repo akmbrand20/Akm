@@ -11,6 +11,20 @@ import "./index.css";
 import App from "./App.jsx";
 
 const queryClient = new QueryClient();
+const publicCatalogQueryDefaults = {
+  staleTime: 5 * 60 * 1000,
+  gcTime: 30 * 60 * 1000,
+  refetchOnWindowFocus: false,
+};
+
+queryClient.setQueryDefaults(["offers"], publicCatalogQueryDefaults);
+queryClient.setQueryDefaults(["products"], publicCatalogQueryDefaults);
+queryClient.setQueryDefaults(["featuredProducts"], publicCatalogQueryDefaults);
+queryClient.setQueryDefaults(["productFilters"], publicCatalogQueryDefaults);
+queryClient.setQueryDefaults(["publicSettings"], {
+  ...publicCatalogQueryDefaults,
+  staleTime: 10 * 60 * 1000,
+});
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

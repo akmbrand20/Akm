@@ -1,8 +1,9 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { calculateCartTotals } from "../lib/cartCalculations";
 import { useSettings } from "./SettingsContext";
-import { getOffers } from "../services/offerService";
 import { getProducts } from "../services/productService";
+import { usePublicOffers } from "../hooks/usePublicOffers";
 import {
   getCartVariantQuantity,
   getMissingBundleSlots,
@@ -194,7 +195,33 @@ const mergeCartItems = (currentItems = [], itemsToAdd = []) => {
 
 export function CartProvider({ children }) {
   const { deliveryFee, freeShippingThreshold } = useSettings();
-  const [offers, setOffers] = useState([]);
+  const { data: publicOffers = [] } = usePublicOffers();
+  const needsBundleProducts = publicOffers.some(
+    (offer) => offer.type === "bundle" && !hasUsableBundleProducts(offer)
+  );
+  const {
+    data: fallbackProducts,
+    isError: fallbackProductsError,
+    isSuccess: fallbackProductsLoaded,
+  } = useQuery({
+    queryKey: ["products", {}],
+    queryFn: () => getProducts(),
+    enabled: needsBundleProducts,
+  });
+  const offers = useMemo(() => {
+    if (!needsBundleProducts) return publicOffers;
+    if (fallbackProductsLoaded) {
+      return hydrateBundleOffers(publicOffers, fallbackProducts || []);
+    }
+    if (fallbackProductsError) return publicOffers;
+    return [];
+  }, [
+    fallbackProducts,
+    fallbackProductsError,
+    fallbackProductsLoaded,
+    needsBundleProducts,
+    publicOffers,
+  ]);
 
   const [cartItems, setCartItems] = useState(getStoredCart);
   const [coupon, setCoupon] = useState(getStoredCoupon);
@@ -205,34 +232,6 @@ export function CartProvider({ children }) {
   useEffect(() => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
   }, [cartItems]);
-
-  useEffect(() => {
-  const loadBundleOffers = async () => {
-    try {
-      const offers = await getOffers();
-      const needsProducts = offers.some(
-        (offer) => offer.type === "bundle" && !hasUsableBundleProducts(offer)
-      );
-
-      if (needsProducts) {
-        try {
-          const products = await getProducts();
-          setOffers(hydrateBundleOffers(offers, products));
-          return;
-        } catch {
-          setOffers(offers);
-          return;
-        }
-      }
-
-      setOffers(offers);
-    } catch {
-      setOffers([]);
-    }
-  };
-
-  loadBundleOffers();
-}, []);
 
   useEffect(() => {
     if (coupon) {
